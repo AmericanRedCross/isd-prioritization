@@ -1,3 +1,31 @@
+// map
+
+var width = 960,
+    height = 580;
+
+// projection and path setup
+var projection = d3.geo.kavrayskiy7()
+    .scale(170)
+    .translate([width / 2, height / 2])
+    .precision(.1);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+
+var quantize = d3.scale.quantize()
+    .domain([0, 10])
+    .range(colorbrewer.Purples[5]);
+    // Every ColorBrewer Scale
+    // http://bl.ocks.org/mbostock/raw/5577023/
+
+
+// make a map
+var map = d3.select('#map').append('svg')
+    .style('height', height + 'px')
+    .style('width', width + 'px');
+
+
 var weightings = {
   "need": 5, // ## category
   "disasters": 3, // sub
@@ -15,8 +43,11 @@ var weightings = {
 };
 
 var countryData = [];
-
+var scoreLookup = {};
 var sliders = [];
+var scores = [];
+
+var oneDecimal = d3.format(".2n");
 
 function setupSliders(){
   sliders = document.getElementsByClassName('sliders');
@@ -40,10 +71,24 @@ function setupSliders(){
   	sliders[i].noUiSlider.on('slide', setWeighting);
   }
 
-  getData();
+  setupMap();
 
 }
 
+function setupMap(){
+  d3.json("data/ne_50m-topo-simple.json", function(error, world) {
+    if (error) throw error;
+    var countries = topojson.feature(world, world.objects.ne_50m).features;
+    map.selectAll(".country")
+        .data(countries)
+      .enter().append("path")
+        .attr("class", "country")
+        .attr("d", path)
+        .style("fill", '#d7d7d8');
+
+    getData();
+  });
+}
 
 function getData(){
   d3.csv("data/prioritization-data.csv", function(d){
@@ -83,6 +128,7 @@ function setWeighting(){
 
 function adjustScores(){
 
+  scores = [];
   $.each(countryData, function(indexA, country){
 
      country.disastersW = country.disasters * weightings.disasters;
@@ -105,6 +151,8 @@ function adjustScores(){
      country.entryW = weightings.entry * country.entry;
 
      country.score = (country.needW + country.fundingW + country.entryW) / (weightings.need + weightings.funding + weightings.entry);
+     scores.push(country.score);
+     scoreLookup[country.iso3] = country.score;
 
   });
 
@@ -120,13 +168,13 @@ function updateTable(){
 
     // UPDATE
     entry.html(function(d){
-      return "<td>" + d.score + "</td><td>" + d.country + "</td>";
+      return "<td>" + oneDecimal(d.score) + "</td><td>" + d.country + "</td>";
     });
 
     // ENTER
     entry.enter().append('tr')
       .html(function(d){
-        return "<td>" + d.score + "</td><td>" + d.country + "</td>";
+        return "<td>" + oneDecimal(d.score) + "</td><td>" + d.country + "</td>";
       });
 
     // EXIT
@@ -135,6 +183,24 @@ function updateTable(){
     entry.sort(function(a,b){
         return d3.descending(a.score, b.score);
       })
+
+    updateMap();
+
+}
+
+function updateMap(){
+
+  quantize.domain([
+      d3.min(d3.values(countryData), function(d) { return d.score; }),
+      d3.max(d3.values(countryData), function(d) { return d.score; })
+    ]);
+  d3.selectAll('.country').each(function(d,i){
+    if(scoreLookup[d.properties.iso]){
+      d3.select(this).style("fill", function(d){
+        return quantize(scoreLookup[d.properties.iso]);
+      });
+    }
+  })
 
 }
 
