@@ -25,7 +25,7 @@ function setupSliders(){
     var defaultWeighting = weightings[category];
   	noUiSlider.create(sliders[i], {
   		start: defaultWeighting,
-  		connect: false,
+  		connect: "lower",
       step: 1,
       tooltip: true,
   		orientation: "horizontal",
@@ -51,18 +51,18 @@ function getData(){
       iso3: d.iso3,
       country: d.country,
       need: 0,
-      disasters: +d.disasters,
-      vuln: +d.vuln,
-      coping: +d.coping,
-      pop: +d.pop,
+      disasters: parseFloat(d.disasters),
+      vuln: parseFloat(d.vuln),
+      coping: parseFloat(d.coping),
+      pop: parseFloat(d.pop),
       funding: 0,
-      oda: +d.oda,
-      recip: +d.recip,
+      oda: parseFloat(d.oda),
+      recip: parseFloat(d.recip),
       entry: 0,
-      ifrc: +d.ifrc,
-      isd: +d.isd,
-      deploy: +d.deploy,
-      conflict: 10 - d.conflict
+      ifrc: parseFloat(d.ifrc),
+      isd: parseFloat(d.isd),
+      deploy: parseFloat(d.deploy),
+      conflict: 10 - parseFloat(d.conflict)
     };
   }, function(error, rows) {
     countryData = rows;
@@ -75,7 +75,6 @@ function setWeighting(){
     var category = $(item).attr("id");
     var weight = item.noUiSlider.get();
     var spanSelector = ".weight." + category;
-    console.log(spanSelector)
     d3.select(spanSelector).html(weight);
     weightings[category] = parseFloat(weight);
   })
@@ -114,13 +113,28 @@ function adjustScores(){
 }
 
 function updateTable(){
-  $("#tablebody").empty();
-  $.each(countryData, function(index, country){
-    var html = "<tr><td>" + country.score + "</td><td>" + country.country + "</td></tr>";
-    $("#tablebody").append(html);
-  });
-  $("#countryTable").DataTable();
 
+    // DATA JOIN
+    var entry = d3.select("#tableBody").selectAll('tr')
+      .data(countryData, function(d){ return d.iso3; });
+
+    // UPDATE
+    entry.html(function(d){
+      return "<td>" + d.score + "</td><td>" + d.country + "</td>";
+    });
+
+    // ENTER
+    entry.enter().append('tr')
+      .html(function(d){
+        return "<td>" + d.score + "</td><td>" + d.country + "</td>";
+      });
+
+    // EXIT
+    entry.exit().remove();
+
+    entry.sort(function(a,b){
+        return d3.descending(a.score, b.score);
+      })
 
 }
 
