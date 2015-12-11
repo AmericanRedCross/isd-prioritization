@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title></title>
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/nouislider.min.css" rel="stylesheet">
+    <link href="css/jquery.datatables.min.css" rel="stylesheet"> <!-- v1.10.10 -->
+
+    <link href="css/custom.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+
+  <div class=container>
+    <div class="row">
+      <div id="need-group" class="col-md-4">
+        <h3>Need <small><span class="need weight"></span></small></h3>
+        <div class="sliders" id="need"></div>
+        <hr>
+        <h5 class="subcat">Disasters <small><span class="disasters weight"></span></small></h5>
+      	<div class="sliders" id="disasters"></div>
+        <h5 class="subcat">Vulnerability <small><span class="vuln weight"></span></small></h5>
+      	<div class="sliders" id="vuln"></div>
+        <h5 class="subcat">Lack of coping capacity <small><span class="coping weight"></span></small></h5>
+        <div class="sliders" id="coping"></div>
+        <h5 class="subcat">Population <small><span class="pop weight"></span></small></h5>
+      	<div class="sliders" id="pop"></div>
+      </div>
+      <div id="funding-group" class="col-md-4">
+        <h3>Available funding <small><span class="funding weight"></span></small></h3>
+        <div class="sliders" id="funding"></div>
+        <hr>
+        <h5 class="subcat">ODA <small><span class="oda weight"></span></small></h5>
+      	<div class="sliders" id="oda"></div>
+        <h5 class="subcat">Top 21 humanitarian assistance recipients <small><span class="recip weight"></span></small></h5>
+      	<div class="sliders" id="recip"></div>
+      </div>
+      <div id="entry-group" class="col-md-4">
+        <h3>Ease of entry/operations <small><span class="entry weight"></span></small></h3>
+        <div class="sliders" id="entry"></div>
+        <hr>
+        <h5 class="subcat">Presence of IFRC office <small><span class="ifrc weight"></span></small></h5>
+      	<div class="sliders" id="ifrc"></div>
+        <h5 class="subcat">ISD staff presence <small><span class="isd weight"></span></small></h5>
+      	<div class="sliders" id="isd"></div>
+        <h5 class="subcat">Past ARC deployments <small><span class="deploy weight"></span></small></h5>
+        <div class="sliders" id="deploy"></div>
+        <h5 class="subcat">Human conflict <small><span class="conflict weight"></span></small></h5>
+      	<div class="sliders" id="conflict"></div>
+      </div>
+    </div>
+
+<hr>
+
+  <div class="row">
+    <table id="countryTable" class="sortable-theme-minimal">
+
+      <thead>
+      <tr>
+        <th>Score</th>
+        <th>Country</th>
+      </tr>
+      </thead>
+
+      <tbody id="tablebody">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/nouislider.min.js"></script>
+    <script src="js/jquery.datatables.min.js"></script> <!-- v1.10.10 -->
+    <script src="js/d3.min.js"></script> <!-- v3.5.10 -->
+    <script src="js/main.js"></script>
+
+
+  </body>
+</html>
