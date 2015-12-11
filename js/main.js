@@ -11,7 +11,7 @@ var weightings = {
   "ifrc": 3, // sub
   "isd": 1, // sub
   "deploy": 1, // sub
-  "conflict": -3 // sub
+  "conflict": 1 // sub
 };
 
 var countryData = [];
@@ -30,7 +30,7 @@ function setupSliders(){
       tooltip: true,
   		orientation: "horizontal",
   		range: {
-  			'min': -5,
+  			'min': 0,
   			'max': 5
   		}
   	});
@@ -62,7 +62,7 @@ function getData(){
       ifrc: +d.ifrc,
       isd: +d.isd,
       deploy: +d.deploy,
-      conflict: +d.conflict
+      conflict: 10 - d.conflict
     };
   }, function(error, rows) {
     countryData = rows;
