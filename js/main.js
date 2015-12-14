@@ -158,11 +158,13 @@ function adjustScores(){
      country.copingW = country.coping * weightings.coping;
      country.popW = country.pop * weightings.pop;
      country.need= (country.disastersW + country.vulnW + country.copingW + country.popW) / (weightings.disasters + weightings.vuln + weightings.coping + weightings.pop);
+     if(isNaN(country.need)){ weightings.need = 0; country.need = 0 };
      country.needW = weightings.need * country.need;
 
      country.odaW = country.oda * weightings.oda;
      country.recipW = country.recip * weightings.recip;
      country.funding = (country.odaW + country.recipW) / (weightings.oda + weightings.recip);
+     if(isNaN(country.funding)){ weightings.funding = 0; country.funding = 0 };
      country.fundingW = weightings.funding * country.funding;
 
      country.ifrcW = country.ifrc * weightings.ifrc;
@@ -170,7 +172,32 @@ function adjustScores(){
      country.deployW = country.deploy * weightings.deploy;
      country.conflictW = country.conflict * weightings.conflict;
      country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict);
+     if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
      country.entryW = weightings.entry * country.entry;
+
+     $(sliders).each(function(index, item){
+       var category = $(item).attr("id");
+       var spanSelector = ".weight." + category;
+       if(weightings.need == 0){
+         if(category == "need"){
+           item.noUiSlider.set(0);
+           d3.select(spanSelector).html('0.00');
+         }
+       }
+       if(weightings.funding == 0){
+         if(category == "funding"){
+           item.noUiSlider.set(0);
+           d3.select(spanSelector).html('0.00');
+         }
+       }
+       if(weightings.entry == 0){
+         if(category == "entry"){
+           item.noUiSlider.set(0);
+           d3.select(spanSelector).html('0.00');
+         }
+       }
+
+     })
 
      country.score = (country.needW + country.fundingW + country.entryW) / (weightings.need + weightings.funding + weightings.entry);
      scores.push(country.score);
@@ -244,5 +271,8 @@ $(document).ready(function() {
     });
 });
 
+function showDisclaimer() {
+  window.alert("The maps used do not imply the expression of any opinion concerning the legal status of a territory or of its authorities.");
+}
 
 setupSliders();
