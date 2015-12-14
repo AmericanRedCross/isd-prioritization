@@ -1,5 +1,5 @@
 // map
-
+var defaultFill = '#d7d7d8';
 var width = 960,
     height = 580;
 
@@ -84,7 +84,20 @@ function setupMap(){
       .enter().append("path")
         .attr("class", "country")
         .attr("d", path)
-        .style("fill", '#d7d7d8');
+        .style("fill", defaultFill)
+        .on("mouseover", function(d){
+          var name = d3.select(this).attr('data-name');
+          if(name){
+            var tooltipText = "<strong>" +
+              d3.select(this).attr('data-name') + " - <small>" +
+              oneDecimal(d3.select(this).attr('data-score')) +
+              "</small></strong>";
+            $('#tooltip').append(tooltipText);
+          } else { $('#tooltip').empty(); }
+        })
+        .on("mouseout", function(d){
+          $('#tooltip').empty();
+        });
 
     getData();
   });
@@ -111,8 +124,17 @@ function getData(){
     };
   }, function(error, rows) {
     countryData = rows;
-    setWeighting();
+    labelCountries();
   });
+}
+
+function labelCountries(){
+  $.each(countryData, function(index, entry){
+    d3.selectAll('.country')
+      .filter(function(d){return d.properties.iso == entry.iso3})
+      .attr('data-name',entry.country)
+  });
+  setWeighting();
 }
 
 function setWeighting(){
@@ -197,12 +219,30 @@ function updateMap(){
   d3.selectAll('.country').each(function(d,i){
     if(scoreLookup[d.properties.iso]){
       d3.select(this).style("fill", function(d){
-        return quantize(scoreLookup[d.properties.iso]);
-      });
+          return quantize(scoreLookup[d.properties.iso]);
+        })
+        .attr('data-score', scoreLookup[d.properties.iso])
+    } else {
+      d3.select(this).style("fill", function(d){
+        return defaultFill;
+      })
+      .attr('data-score', '');
     }
   })
 
 }
+
+// tooltip follows cursor
+$(document).ready(function() {
+    $('#map').mouseover(function(e) {
+        //Set the X and Y axis of the tooltip
+        $('#tooltip').css('top', e.pageY + 10 );
+        $('#tooltip').css('left', e.pageX + 20 );
+    }).mousemove(function(e) {
+        //Keep changing the X and Y axis for the tooltip, thus, the tooltip move along with the mouse
+        $("#tooltip").css({top:(e.pageY+15)+"px",left:(e.pageX+20)+"px"});
+    });
+});
 
 
 setupSliders();

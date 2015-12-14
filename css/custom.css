@@ -2,3 +2,16 @@
   margin:10px;
   max-width: 200px;
 }
+
+#tooltip {
+    position:absolute;
+    z-index:999;
+    font-size:14px;
+    color: #1a1a1a;
+    background-color: rgba(245,245,245,1);
+    border-radius: 3px;
+    padding: 2px;
+}
+#tooltip:empty {
+    display:none;
+}
