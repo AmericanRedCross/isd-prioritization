@@ -24,51 +24,122 @@
   </head>
   <body>
 
+    <div id="info-modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">ISD Prioritization</h4>
+          </div>
+          <div class="modal-body">
+
+<p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our analysis focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
+<p><b><i>Need</i></b> includes natural disaster risk, vulnerability, lack of coping capacity, and population.</p>
+<p><b><i>Funding</i></b> includes ODA and country-specific humanitarian funding.</p>
+<p><b><i>Ease</i></b> includes the presence of an IFRC country office, number of ISD staff in-country, number of previous ARC disaster deployments, and the lack of human conflict.</p>
+<p>High-conflict countries and OFAC-restricted countries have been removed from analysis. Data were turned into a weighted index. <b>In each map, darker color shading indicates higher values and greater suitability for ISD program activities.</b></p>
+
+<hr>
+
+<p><h5>Natural disasters - 2015 projected disaster risk</h5>
+<small>Data source: 2015 INFORM database.</small></p>
+
+<p><h5>Vulnerability - Includes socioeconomics and vulnerable groups.</h5>
+<small>Data source: 2015 INFORM database.</small></p>
+
+<p><h5>Lack of Coping Capacity - Includes institutional support and existing infrastructure</h5>
+<small>Data source: 2015 INFORM database.</small></p>
+
+<p><h5>Population - 2013, in millions </h5>
+<small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+
+<p><h5>Official Development Assistance - 2012-2013 average, in billions USD </h5>
+<small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+
+<p><h5>Presence of IFRC Office - Indicates ease of entry for ARC operations </h5>
+<small>Data source: ARC, IFRC. Data are accurate as of December 2015.</small></p>
+
+<p><h5>Previous Emergency Deployments - ARC staff deployed, 2009-2015  </h5>
+<small>Data source: ARC. Data includes emergency deployments from 2009-2015, inclusive.</small></p>
+
+<p><h5>Existing ISD Staff - Number of current staff </h5>
+<small>Data source: ARC. Data are accurate as of Dec 2015.</small></p>
+
+<p><h5>Lack of Human Conflict - Includes current and projected levels </h5>
+<small>Data source: 2015 INFORM database.</small></p>
+
+<hr>
+
+<p><small>The maps used do not imply the expression of any opinion concerning the legal status of a territory or of its authorities.</small></p>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+  <div id="title"><h2 style="margin:0px;">ISD Prioritization
+    <small>
+    <span id="info-icon" class="glyphicon glyphicon-info-sign" aria-hidden="true" onClick="$('#info-modal').modal();"></span>
+    </small>
+  </h2></div>
+
+  <img id="logo" src="images/arc_logo.png">
+
   <div id="tooltip"></div>
 
   <div class="container-fluid">
 
     <div class="row">
-      <div id="map" style="width=100%; text-align:center;"></div>
+      <div id="map"></div>
     </div>
   </div>
 
 <div class="container">
     <div class="row">
-      <div id="need-group" class="col-md-4">
+      <div id="need-group" class="col-sm-4">
         <h3>Need <small><span class="need weight"></span></small></h3>
         <div class="sliders" id="need"></div>
         <hr>
-        <h5 class="subcat">Disasters <small><span class="disasters weight"></span></small></h5>
-      	<div class="sliders" id="disasters"></div>
-        <h5 class="subcat">Vulnerability <small><span class="vuln weight"></span></small></h5>
-      	<div class="sliders" id="vuln"></div>
-        <h5 class="subcat">Lack of coping capacity <small><span class="coping weight"></span></small></h5>
-        <div class="sliders" id="coping"></div>
-        <h5 class="subcat">Population <small><span class="pop weight"></span></small></h5>
-      	<div class="sliders" id="pop"></div>
+        <div class="subcat-group">
+          <h5 class="subcat">Disasters <small><span class="disasters weight"></span></small></h5>
+        	<div class="sliders" id="disasters"></div>
+          <h5 class="subcat">Vulnerability <small><span class="vuln weight"></span></small></h5>
+        	<div class="sliders" id="vuln"></div>
+          <h5 class="subcat">Lack of coping capacity <small><span class="coping weight"></span></small></h5>
+          <div class="sliders" id="coping"></div>
+          <h5 class="subcat">Population <small><span class="pop weight"></span></small></h5>
+        	<div class="sliders" id="pop"></div>
+        </div>
       </div>
-      <div id="funding-group" class="col-md-4">
+      <div id="funding-group" class="col-sm-4">
         <h3>Available funding <small><span class="funding weight"></span></small></h3>
         <div class="sliders" id="funding"></div>
         <hr>
-        <h5 class="subcat">ODA <small><span class="oda weight"></span></small></h5>
-      	<div class="sliders" id="oda"></div>
-        <h5 class="subcat">Top 21 humanitarian assistance recipients <small><span class="recip weight"></span></small></h5>
-      	<div class="sliders" id="recip"></div>
+        <div class="subcat-group">
+          <h5 class="subcat">ODA <small><span class="oda weight"></span></small></h5>
+        	<div class="sliders" id="oda"></div>
+          <h5 class="subcat">Top 21 humanitarian assistance recipients <small><span class="recip weight"></span></small></h5>
+        	<div class="sliders" id="recip"></div>
+        </div>
       </div>
-      <div id="entry-group" class="col-md-4">
+      <div id="entry-group" class="col-sm-4">
         <h3>Ease of entry/operations <small><span class="entry weight"></span></small></h3>
         <div class="sliders" id="entry"></div>
         <hr>
-        <h5 class="subcat">Presence of IFRC office <small><span class="ifrc weight"></span></small></h5>
-      	<div class="sliders" id="ifrc"></div>
-        <h5 class="subcat">ISD staff presence <small><span class="isd weight"></span></small></h5>
-      	<div class="sliders" id="isd"></div>
-        <h5 class="subcat">Past ARC deployments <small><span class="deploy weight"></span></small></h5>
-        <div class="sliders" id="deploy"></div>
-        <h5 class="subcat">Human conflict (lack of) <small><span class="conflict weight"></span></small></h5>
-      	<div class="sliders" id="conflict"></div>
+        <div class="subcat-group">
+          <h5 class="subcat">Presence of IFRC office <small><span class="ifrc weight"></span></small></h5>
+        	<div class="sliders" id="ifrc"></div>
+          <h5 class="subcat">ISD staff presence <small><span class="isd weight"></span></small></h5>
+        	<div class="sliders" id="isd"></div>
+          <h5 class="subcat">Past ARC deployments <small><span class="deploy weight"></span></small></h5>
+          <div class="sliders" id="deploy"></div>
+          <h5 class="subcat">Human conflict (lack of) <small><span class="conflict weight"></span></small></h5>
+        	<div class="sliders" id="conflict"></div>
+        </div>
       </div>
     </div>
 

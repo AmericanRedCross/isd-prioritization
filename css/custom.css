@@ -1,8 +1,35 @@
+#logo {
+  position:absolute;
+  top:0;
+  right:0;
+  margin: 10px 20px;
+  height: 40px;
+}
+#info-icon {
+  cursor:pointer;
+}
+#info-icon:hover {
+  color: #000000;
+}
+#title {
+  position:absolute;
+  top:0;
+  left:0;
+  margin: 10px 20px;
+}
+#map {
+  width:100%;
+  text-align:center;
+  margin-bottom: -50px;
+}
 .sliders {
   margin:10px;
-  max-width: 200px;
+  max-width:200px;
+  background:rgb(127, 0, 0);
 }
-
+.subcat-group .sliders {
+  background:rgb(215, 48, 31);
+}
 #tooltip {
     position:absolute;
     z-index:999;
