@@ -76,7 +76,7 @@ function setupSliders(){
 }
 
 function setupMap(){
-  d3.json("data/ne_50m-topo-simple.json", function(error, world) {
+  d3.json("data/ne_50m-simple-topo.json", function(error, world) {
     if (error) throw error;
     var countries = topojson.feature(world, world.objects.ne_50m).features;
     map.selectAll(".country")
@@ -86,10 +86,10 @@ function setupMap(){
         .attr("d", path)
         .style("fill", defaultFill)
         .on("mouseover", function(d){
-          var name = d3.select(this).attr('data-name');
-          if(name){
+          var score = d3.select(this).attr('data-score');
+          if(score){
             var tooltipText = "<strong>" +
-              d3.select(this).attr('data-name') + " - <small>" +
+              d.name + " - <small>" +
               oneDecimal(d3.select(this).attr('data-score')) +
               "</small></strong>";
             $('#tooltip').append(tooltipText);
@@ -124,17 +124,8 @@ function getData(){
     };
   }, function(error, rows) {
     countryData = rows;
-    labelCountries();
+    setWeighting();
   });
-}
-
-function labelCountries(){
-  $.each(countryData, function(index, entry){
-    d3.selectAll('.country')
-      .filter(function(d){return d.properties.iso == entry.iso3})
-      .attr('data-name',entry.country)
-  });
-  setWeighting();
 }
 
 function setWeighting(){
