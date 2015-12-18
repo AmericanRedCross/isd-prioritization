@@ -86,14 +86,11 @@ function setupMap(){
         .attr("d", path)
         .style("fill", defaultFill)
         .on("mouseover", function(d){
+          var tooltipText = "<strong>" + d.properties.name + " - <small>";
           var score = d3.select(this).attr('data-score');
-          if(score){
-            var tooltipText = "<strong>" +
-              d.name + " - <small>" +
-              oneDecimal(d3.select(this).attr('data-score')) +
-              "</small></strong>";
-            $('#tooltip').append(tooltipText);
-          } else { $('#tooltip').empty(); }
+          tooltipText += score ? oneDecimal(d3.select(this).attr('data-score')) : 'n/a';
+          tooltipText += "</small></strong>";
+          $('#tooltip').append(tooltipText);
         })
         .on("mouseout", function(d){
           $('#tooltip').empty();
