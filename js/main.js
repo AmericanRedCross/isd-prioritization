@@ -1,9 +1,10 @@
 d3.select(window).on("resize", throttle);
 
-var svg, g, world, countryData;
+var svg, g, world, countryData, programSectors;
 var scoreLookup = {};
 var sliders = [];
 var scores = [];
+
 
 // var zoom = d3.behavior.zoom()
 //     .scaleExtent([1, 8])
@@ -72,7 +73,8 @@ var weightings = {
   "ifrc": 3, // sub
   "isd": 1, // sub
   "deploy": 1, // sub
-  "conflict": 1 // sub
+  "conflict": 1, // sub
+  "fy16": 0 // sub
 };
 
 var oneDecimal = d3.format(".2n");
@@ -118,7 +120,13 @@ function grabData(){
       ifrc: parseFloat(d.ifrc),
       isd: parseFloat(d.isd),
       deploy: parseFloat(d.deploy),
-      conflict: 10 - parseFloat(d.conflict)
+      conflict: 10 - parseFloat(d.conflict),
+      cbh: parseFloat(d.cbh),
+      drr: parseFloat(d.drr),
+      measles: parseFloat(d.measles),
+      resilience: parseFloat(d.resilience),
+      od: parseFloat(d.od),
+      urbandp: parseFloat(d.urbandp)
     };
   }, function(error, rows) {
     countryData = rows;
@@ -164,6 +172,14 @@ function setWeighting(){
     weightings[category] = parseFloat(weight);
   })
 
+  programSectors = [];
+  checkboxes = $("#program-sectors input[type=checkbox]");
+  for (i=0; i<checkboxes.length; i++) {
+    if(checkboxes[i].checked === true) {
+      programSectors.push(checkboxes[i].value);
+    }
+  }
+
   adjustScores();
 }
 
@@ -189,9 +205,20 @@ function adjustScores(){
      country.isdW = country.isd * weightings.isd;
      country.deployW = country.deploy * weightings.deploy;
      country.conflictW = country.conflict * weightings.conflict;
-     country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict);
-     if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
-     country.entryW = weightings.entry * country.entry;
+    //  country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict);
+    //  if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
+    //  country.entryW = weightings.entry * country.entry;
+    var programs = false;
+    $(programSectors).each(function(index, sector){
+      if(country[sector] > 0){ programs = true; }
+    });
+    country.fy16 = (programs === true) ? 10 : 0;
+    country.fy16W = country.fy16 * weightings.fy16;
+    country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW + country.fy16W) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict + weightings.fy16);
+    if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
+    country.entryW = weightings.entry * country.entry;
+
+
 
      $(sliders).each(function(index, item){
        var category = $(item).attr("id");
@@ -218,6 +245,7 @@ function adjustScores(){
      })
 
      country.score = (country.needW + country.fundingW + country.entryW) / (weightings.need + weightings.funding + weightings.entry);
+     if(isNaN(country.score)){ country.score = 0; };
      scores.push(country.score);
      scoreLookup[country.iso3] = country.score;
   });
@@ -295,6 +323,17 @@ function redraw() {
 //   g.style("stroke-width", 1 / s).attr("transform", "translate(" + t + ")scale(" + s + ")");
 //
 // }
+
+function checkedPrograms(change){
+  checkboxes = $("#program-sectors input[type=checkbox]");
+  if(change === 'all'){
+    for (i=0; i<checkboxes.length; i++) { checkboxes[i].checked = true; }
+  }
+  if(change === 'none'){
+    for (i=0; i<checkboxes.length; i++) { checkboxes[i].checked = false; }
+  }
+  setWeighting();
+}
 
 // tooltip follows cursor
 $(document).ready(function() {

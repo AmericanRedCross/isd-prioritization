@@ -68,6 +68,9 @@
 <p><h5>Lack of Human Conflict - Includes current and projected levels </h5>
 <small>Data source: 2016 INFORM database v0.2.25.</small></p>
 
+<p><h5>ISD FY16 Programs - Programs being implemented in fiscal year 2016 </h5>
+<small>Data source: ARC. Data are accurate as of 18 Dec 2015. Note that several countries have FY16 programs but were excluded from the analysis for other reasons (such as DAC countries or high conflict). These include: Bahamas, Barbados, Central African Republic, Mexico, Russia, Somalia, Trinidad and Tobago, Uganda, and Ukraine.</small></p>
+
 <hr>
 
 <p><small>The maps used do not imply the expression of any opinion concerning the legal status of a territory or of its authorities.</small></p>
@@ -139,7 +142,39 @@
           <div class="sliders" id="deploy"></div>
           <h5 class="subcat">Human conflict (lack of) <small><span class="conflict weight"></span></small></h5>
         	<div class="sliders" id="conflict"></div>
+          <h5 class="subcat">ISD FY16 programs <small><span class="fy16 weight"></span></small></h5>
+        	<div class="sliders" id="fy16"></div>
         </div>
+
+        <button class="btn btn-default btn-xs" type="button" data-toggle="collapse" data-target="#collapsePrograms" aria-expanded="false" aria-controls="collapsePrograms">
+          Choose sectors
+        </button>
+        <div class="collapse" id="collapsePrograms">
+          <div class="well">
+            <div><small>Select <a onClick="checkedPrograms('all');">all</a> | <a onClick="checkedPrograms('none');">none</a></small></div>
+            <div id="program-sectors">
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="cbh" onchange="setWeighting();" checked>Community-based health</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="drr" onchange="setWeighting();" checked>Disaster recovery</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="measles" onchange="setWeighting();" checked>Measles prevention</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="resilience" onchange="setWeighting();" checked>Resilience building</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="od" onchange="setWeighting();" checked>Strengthening Red Cross partners</label>
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="program-check" value="urbandp" onchange="setWeighting();" checked>Urban disaster preparedness</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

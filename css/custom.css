@@ -30,6 +30,9 @@
 .subcat-group .sliders {
   background:rgb(215, 48, 31);
 }
+#collapsePrograms .well {
+  padding: 6px 19px;
+}
 #tooltip {
     position:absolute;
     z-index:999;
