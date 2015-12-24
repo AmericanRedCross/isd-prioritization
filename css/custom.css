@@ -27,9 +27,34 @@
   max-width:200px;
   background:rgb(127, 0, 0);
 }
-.subcat-group .sliders {
-  background:rgb(215, 48, 31);
+.graph-segment {
+  cursor: pointer;
+  display: inline-block;
+  height:12px;
 }
+.graph-text-col {
+  text-align: right;
+  padding: 0 6px;
+}
+.graph-bar-col  {
+  padding: 0;
+}
+
+#need.sliders { background: #08306b; }
+  #disasters.sliders { background: #6baed6; }
+  #vuln.sliders { background: #4292c6; }
+  #coping.sliders { background: #2171b5; }
+  #pop.sliders { background: #08519c; }
+#funding.sliders { background: #00441b; }
+  #oda.sliders { background: #41ab5d; }
+  #recip.sliders { background: #238b45; }
+#entry.sliders { background: #3f007d; }
+  #ifrc.sliders { background: #dadaeb; }
+  #isd.sliders { background: #bcbddc; }
+  #deploy.sliders { background: #9e9ac8; }
+  #conflict.sliders { background: #807dba; }
+  #fy16.sliders { background: #6a51a3; }
+
 #collapsePrograms .well {
   padding: 6px 19px;
 }

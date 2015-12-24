@@ -3,8 +3,6 @@ d3.select(window).on("resize", throttle);
 var svg, g, world, countryData, programSectors;
 var scoreLookup = {};
 var sliders = [];
-var scores = [];
-
 
 // var zoom = d3.behavior.zoom()
 //     .scaleExtent([1, 8])
@@ -28,9 +26,7 @@ function setDimensions(){
 setDimensions();
 
 function setup(width,height){
-  // projection = d3.geo.mercator()
-  //   .translate([0, 0])
-  //   .scale(width / 2 / Math.PI);
+
   projection = d3.geo.kavrayskiy7()
     .translate([0, 0])
     .scale(width / 2 / Math.PI);
@@ -48,15 +44,9 @@ function setup(width,height){
 
 setup(width,height);
 
-// projection and path setup
-// var projection = d3.geo.kavrayskiy7()
-//     .scale(170)
-//     .translate([width / 2, height / 2])
-//     .precision(.1);
-
 var quantize = d3.scale.quantize()
     .domain([0, 10])
-    .range(colorbrewer.OrRd[9]);
+    .range(colorbrewer.Reds[9]);
     // Every ColorBrewer Scale
     // http://bl.ocks.org/mbostock/raw/5577023/
 
@@ -131,9 +121,54 @@ function grabData(){
   }, function(error, rows) {
     countryData = rows;
 
-    grabGeoData()
+    buildTable();
   });
 }
+
+var graphSegments = [
+  {id:"disastersW",details:{label:"Disasters",color:"#6baed6"}},
+  {id:"vulnW",details:{label:"Vulnerability",color:"#4292c6"}},
+  {id:"copingW",details:{label:"Lack of coping capacity",color:"#2171b5"}},
+  {id:"popW",details:{label:"Population",color:"#08519c"}},
+  {id:"odaW",details:{label:"ODA",color:"#41ab5d"}},
+  {id:"recipW",details:{label:"Top 21",color:"#238b45"}},
+  {id:"ifrcW",details:{label:"IFRC office",color:"#dadaeb"}},
+  {id:"isdW",details:{label:"ISD staff",color:"#bcbddc"}},
+  {id:"deployW",details:{label:"ARC deployments",color:"#9e9ac8"}},
+  {id:"conflictW",details:{label:"Conflict (lack of)",color:"#807dba"}},
+  {id:"fy16W",details:{label:"ISD FY16 programs",color:"#6a51a3"}}
+];
+var rows;
+
+function buildTable(){
+
+    rows = d3.select('#graph').selectAll('div')
+      .data(countryData, function(d){ return d.iso3; }).enter()
+      .append('div')
+      .attr('id', function(d){ return "row-" + d.iso3; })
+      .classed({"row":true,"graph-row":true})
+      .attr('data-score',0)
+      .html(function(d){
+        graphSegmentsHtml = "";
+        for(var i=0; i<graphSegments.length; i++){
+          var thisSegmentHtml = '<div class="graph-segment ' + graphSegments[i].id +
+          '" style="background-color:' + graphSegments[i].details.color + '; width:0%;" data-label="' + graphSegments[i].details.label + '" data-score=""></div>';
+          graphSegmentsHtml += thisSegmentHtml;
+        }
+        html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small> - <span class="score-text"></span></small></div>' + '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
+        return html;
+      })
+
+      d3.selectAll(".graph-segment").on("mouseover", function(d){
+        var tooltipText = "<small><b>" + $(this).attr("data-label") + "</b> - " + $(this).attr("data-score") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+  grabGeoData()
+}
+
 
 function grabGeoData(){
   d3.json("data/ne_50m-simple-topo.json", function(error, data) {
@@ -184,101 +219,65 @@ function setWeighting(){
 }
 
 function adjustScores(){
-  scores = [];
-  $.each(countryData, function(indexA, country){
 
-     country.disastersW = country.disasters * weightings.disasters;
-     country.vulnW = country.vuln * weightings.vuln;
-     country.copingW = country.coping * weightings.coping;
-     country.popW = country.pop * weightings.pop;
-     country.need= (country.disastersW + country.vulnW + country.copingW + country.popW) / (weightings.disasters + weightings.vuln + weightings.coping + weightings.pop);
-     if(isNaN(country.need)){ weightings.need = 0; country.need = 0 };
-     country.needW = weightings.need * country.need;
+  $.each(countryData, function(countryIndex, country){
+    var needWeightingsSum = weightings.disasters + weightings.vuln + weightings.coping + weightings.pop;
+    var fundingWeightingsSum = weightings.oda + weightings.recip;
+    var entryWeightingsSum = weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict + weightings.fy16;
+    var categoryWeightingsSum = weightings.need + weightings.funding + weightings.entry;
 
-     country.odaW = country.oda * weightings.oda;
-     country.recipW = country.recip * weightings.recip;
-     country.funding = (country.odaW + country.recipW) / (weightings.oda + weightings.recip);
-     if(isNaN(country.funding)){ weightings.funding = 0; country.funding = 0 };
-     country.fundingW = weightings.funding * country.funding;
-
-     country.ifrcW = country.ifrc * weightings.ifrc;
-     country.isdW = country.isd * weightings.isd;
-     country.deployW = country.deploy * weightings.deploy;
-     country.conflictW = country.conflict * weightings.conflict;
-    //  country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict);
-    //  if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
-    //  country.entryW = weightings.entry * country.entry;
+    country.disastersW =  weightings.need * (weightings.disasters * country.disasters / needWeightingsSum) / categoryWeightingsSum;
+    country.vulnW = weightings.need * (weightings.vuln * country.vuln / needWeightingsSum) / categoryWeightingsSum;
+    country.copingW = weightings.need * (weightings.coping * country.coping / needWeightingsSum) / categoryWeightingsSum;
+    country.popW = weightings.need * (weightings.pop * country.pop / needWeightingsSum) / categoryWeightingsSum;
+    country.odaW = weightings.funding * (weightings.oda * country.oda / fundingWeightingsSum) / categoryWeightingsSum;
+    country.recipW = weightings.funding * (weightings.recip * country.recip / fundingWeightingsSum) / categoryWeightingsSum;
+    country.ifrcW = weightings.entry * (weightings.ifrc * country.ifrc / entryWeightingsSum) / categoryWeightingsSum;
+    country.isdW = weightings.entry * (weightings.isd * country.isd / entryWeightingsSum) / categoryWeightingsSum;
+    country.deployW = weightings.entry * (weightings.deploy * country.deploy / entryWeightingsSum) / categoryWeightingsSum;
+    country.conflictW = weightings.entry * (weightings.conflict * country.conflict / entryWeightingsSum) / categoryWeightingsSum;
     var programs = false;
-    $(programSectors).each(function(index, sector){
-      if(country[sector] > 0){ programs = true; }
+    $(programSectors).each(function(sectorIndex, sector){
+      if(country[sector] != 0){ programs = true; } else {console.log("false")}
     });
     country.fy16 = (programs === true) ? 10 : 0;
-    country.fy16W = country.fy16 * weightings.fy16;
-    country.entry = (country.ifrcW + country.isdW + country.deployW + country.conflictW + country.fy16W) / (weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict + weightings.fy16);
-    if(isNaN(country.entry)){ weightings.entry = 0; country.entry = 0; };
-    country.entryW = weightings.entry * country.entry;
+    country.fy16W = weightings.entry * (weightings.fy16 * country.fy16 / entryWeightingsSum) / categoryWeightingsSum;
 
+    for(var i=0; i<graphSegments.length; i++){
+      subCat = graphSegments[i].id
+      if(isNaN(country[subCat])){ country[subCat] = 0;};
+    }
 
-
-     $(sliders).each(function(index, item){
-       var category = $(item).attr("id");
-       var spanSelector = ".weight." + category;
-       if(weightings.need == 0){
-         if(category == "need"){
-           item.noUiSlider.set(0);
-           d3.select(spanSelector).html('0.00');
-         }
-       }
-       if(weightings.funding == 0){
-         if(category == "funding"){
-           item.noUiSlider.set(0);
-           d3.select(spanSelector).html('0.00');
-         }
-       }
-       if(weightings.entry == 0){
-         if(category == "entry"){
-           item.noUiSlider.set(0);
-           d3.select(spanSelector).html('0.00');
-         }
-       }
-
-     })
-
-     country.score = (country.needW + country.fundingW + country.entryW) / (weightings.need + weightings.funding + weightings.entry);
-     if(isNaN(country.score)){ country.score = 0; };
-     scores.push(country.score);
-     scoreLookup[country.iso3] = country.score;
+    country.score = country.disastersW + country.vulnW + country.copingW + country.popW + country.odaW + country.recipW + country.ifrcW + country.isdW + country.deployW  + country.conflictW + country.fy16W;
+    scoreLookup[country.iso3] = country.score;
   });
 
   updateTable();
 }
 
+
 function updateTable(){
 
-    // DATA JOIN
-    var entry = d3.select("#tableBody").selectAll('tr')
-      .data(countryData, function(d){ return d.iso3; });
+  // UPDATED DATA JOIN
+  rows.data(countryData, function(d){ return d.iso3; });
 
-    // UPDATE
-    entry.html(function(d){
-      return "<td>" + oneDecimal(d.score) + "</td><td>" + d.country + "</td>";
-    });
+  rows.each(function(d){
+    d3.select(this).select('.score-text').text(oneDecimal(d.score));
+    for(var i=0; i<graphSegments.length; i++){
+      selector = ".graph-segment." + graphSegments[i].id
+      segmentWidth = d[graphSegments[i].id] * 10 + "%"
+      d3.select(this).select(selector)
+        .style('width',segmentWidth)
+        .attr('data-score', oneDecimal(d[graphSegments[i].id]))
+    }
 
-    // ENTER
-    entry.enter().append('tr')
-      .html(function(d){
-        return "<td>" + oneDecimal(d.score) + "</td><td>" + d.country + "</td>";
-      });
+  })
 
-    // EXIT
-    entry.exit().remove();
-
-    entry.sort(function(a,b){
-        return d3.descending(a.score, b.score);
-      })
+  rows.sort(function(a,b){
+    return d3.descending(a.score, b.score);
+  })
 
     updateMapColors();
-
 }
 
 function updateMapColors(){
@@ -337,7 +336,7 @@ function checkedPrograms(change){
 
 // tooltip follows cursor
 $(document).ready(function() {
-    $('#map').mouseover(function(e) {
+    $('body').mouseover(function(e) {
         //Set the X and Y axis of the tooltip
         $('#tooltip').css('top', e.pageY + 10 );
         $('#tooltip').css('left', e.pageX + 20 );
@@ -346,6 +345,8 @@ $(document).ready(function() {
         $("#tooltip").css({top:(e.pageY+15)+"px",left:(e.pageX+20)+"px"});
     });
 });
+
+
 
 var throttleTimer;
 function throttle() {
