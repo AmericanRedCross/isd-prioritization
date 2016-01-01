@@ -238,7 +238,7 @@ function adjustScores(){
     country.conflictW = weightings.entry * (weightings.conflict * country.conflict / entryWeightingsSum) / categoryWeightingsSum;
     var programs = false;
     $(programSectors).each(function(sectorIndex, sector){
-      if(country[sector] != 0){ programs = true; } else {console.log("false")}
+      if(country[sector] != 0){ programs = true; }
     });
     country.fy16 = (programs === true) ? 10 : 0;
     country.fy16W = weightings.entry * (weightings.fy16 * country.fy16 / entryWeightingsSum) / categoryWeightingsSum;
