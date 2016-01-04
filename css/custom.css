@@ -1,3 +1,6 @@
+.row {
+  margin:0;
+}
 #logo {
   position:absolute;
   top:0;
@@ -5,10 +8,13 @@
   margin: 10px 20px;
   height: 40px;
 }
-#info-icon {
+.info-icon {
+  color: #777;
   cursor:pointer;
+  text-decoration: none;
+  cursor: pointer;
 }
-#info-icon:hover {
+.info-icon:hover {
   color: #000000;
 }
 #title {
@@ -39,7 +45,24 @@
 .graph-bar-col  {
   padding: 0;
 }
-
+#map {
+  margin-top:60px;
+}
+@media (min-width:550px){
+  #map {
+    margin-top:40px;
+  }
+}
+@media (min-width:800px){
+  #map {
+    margin-top:20px;
+  }
+}
+@media (min-width:1000px){
+  #map {
+    margin-top:0px;
+  }
+}
 #need.sliders { background: #08306b; }
   #disasters.sliders { background: #6baed6; }
   #vuln.sliders { background: #4292c6; }

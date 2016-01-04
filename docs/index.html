@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ISD prioritization</title>
+
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/custom.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body style="background:#f5f5f5;">
+
+    <div id="info-modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">ISD Prioritization</h4>
+          </div>
+          <div class="modal-body">
+
+    <p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our analysis focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
+    <p><b><i>Need</i></b> includes natural disaster risk, vulnerability, lack of coping capacity, and population.</p>
+    <p><b><i>Funding</i></b> includes ODA and country-specific humanitarian funding.</p>
+    <p><b><i>Ease</i></b> includes the presence of an IFRC country office, number of ISD staff in-country, number of previous ARC disaster deployments, and the lack of human conflict.</p>
+    <p>High-conflict countries and OFAC-restricted countries have been removed from analysis. Data were turned into a weighted index. <b>In each map, darker color shading indicates higher values and greater suitability for ISD program activities.</b></p>
+
+    <hr>
+
+    <p><h5>Natural disasters - 2016 projected disaster risk</h5>
+    <small>Data source: 2016 INFORM database v0.2.25.</small></p>
+
+    <p><h5>Vulnerability - Includes socioeconomics and vulnerable groups.</h5>
+    <small>Data source: 2016 INFORM database v0.2.25.</small></p>
+
+    <p><h5>Lack of Coping Capacity - Includes institutional support and existing infrastructure</h5>
+    <small>Data source: 2016 INFORM database v0.2.25.</small></p>
+
+    <p><h5>Population - 2013, in millions </h5>
+    <small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+
+    <p><h5>Official Development Assistance - 2012-2013 average, in billions USD </h5>
+    <small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+
+    <p><h5>Presence of IFRC Office - Indicates ease of entry for ARC operations </h5>
+    <small>Data source: ARC, IFRC. Data are accurate as of December 2015.</small></p>
+
+    <p><h5>Previous Emergency Deployments - ARC staff deployed, 2009-2015  </h5>
+    <small>Data source: ARC. Data includes emergency deployments from 2009-2015, inclusive.</small></p>
+
+    <p><h5>Existing ISD Staff - Number of current staff </h5>
+    <small>Data source: ARC. Data are accurate as of Dec 2015.</small></p>
+
+    <p><h5>Lack of Human Conflict - Includes current and projected levels </h5>
+    <small>Data source: 2016 INFORM database v0.2.25.</small></p>
+
+    <p><h5>ISD FY16 Programs - Programs being implemented in fiscal year 2016 </h5>
+    <small>Data source: ARC. Data are accurate as of 18 Dec 2015. Note that several countries have FY16 programs but were excluded from the analysis for other reasons (such as DAC countries or high conflict). These include: Bahamas, Barbados, Central African Republic, Mexico, Russia, Somalia, Trinidad and Tobago, Uganda, and Ukraine.</small></p>
+
+    <hr>
+
+    <p><small>The maps used do not imply the expression of any opinion concerning the legal status of a territory or of its authorities.</small></p>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+  <div class="container">
+    <div class="row">
+
+      <div style="display:inline-block;">
+        <h2>ISD Prioritization</h2>
+        <p><small>
+        <span class="info-icon" onClick="$('#info-modal').modal();">
+          <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>  source info
+        </span>&nbsp; | &nbsp;
+          <a class="info-icon" href="../"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span> interactive web map</a>
+        </small></p>
+      </div>
+
+      <img style="float: right; display:inline-block; margin: 20px; height: 40px;" src="../images/arc_logo.png">
+
+    </div>
+
+    <div class="row" style="margin:25px 0;">
+      <div class="col-xs-10 col-xs-offset-1">
+      <p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our analysis focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
+      <p>High-conflict countries and OFAC-restricted countries have been removed from analysis. Data were turned into a weighted index. In each map, darker color shading indicates higher values and greater suitability for ISD program activities.</p>
+      <p><a class="info-icon" href="maps/maps.zip" target="_blank" download>
+        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> &nbsp; Download a zip folder of all maps</a> or individually below.
+      </p>
+      </div>
+    </div>
+
+    <div id="thumbs" class="row">
+    </div>
+
+
+  <div style="height:80px;"></div> <!-- spacer  -->
+
+</div>
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/d3.min.js"></script> <!-- v3.5.10 -->
+<script>
+
+d3.select(window).on("resize", throttle);
+
+function sizeUp(){
+
+  d3.select('#thumbs').selectAll('.thumbnail').style("height", "100%")
+  d3.select('#thumbs').selectAll('.row').each(function(d){
+    var height = 0;
+    d3.select(this).selectAll('.thumbnail').each(function(d){
+      if($(this).outerHeight() > height){ height = $(this).outerHeight() }
+    });
+    d3.select(this).selectAll('.thumbnail').style("height", height + "px")
+  })
+
+}
+
+var throttleTimer;
+function throttle() {
+  window.clearTimeout(throttleTimer);
+    throttleTimer = window.setTimeout(function() {
+      sizeUp();
+    }, 200);
+}
+
+d3.csv("files.csv", function(metadata){
+    var html = "";
+    var count = 0;
+    $.each(metadata, function(i, item){
+      count ++;
+      html += (count === 1) ? '<div class="row" style="text-align:center;">' : '';
+      html += '<div class="col-xs-6 col-sm-3">' +
+        '<a class="thumbnail" href="maps/' + item.filename + '" target="_blank" download>' +
+          '<img src="thumbs/' + item.filename.slice(0,-4) + '_THUMB.png">' +
+          '<div class="caption"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> &nbsp;' + item.title + '</div>' +
+        '</a></div>';
+      html += (count === 4) ? '</div>' : '';
+      if(count === 4){ count = 0 }
+    });
+    $('#thumbs').append(html);
+    throttle();
+});
+
+</script>
+
+
+  </body>
+</html>
