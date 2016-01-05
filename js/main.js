@@ -224,6 +224,17 @@ function setWeighting(){
     }
   }
 
+  d3.selectAll('.sliders').classed('null-slider', false);
+  if(weightings.need === 0){
+    d3.selectAll('.sliders.need').classed('null-slider', true);
+  }
+  if(weightings.funding === 0){
+    d3.selectAll('.sliders.funding').classed('null-slider', true);
+  }
+  if(weightings.entry === 0){
+    d3.selectAll('.sliders.entry').classed('null-slider', true);
+  }
+
   adjustScores();
 }
 

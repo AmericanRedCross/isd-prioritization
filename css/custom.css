@@ -97,7 +97,7 @@
   #deploy.sliders { background: #9e9ac8; }
   #conflict.sliders { background: #807dba; }
   #fy16.sliders { background: #6a51a3; }
-
+.sliders.null-slider { background: #e4e4e5 !important;}
 #collapsePrograms .well {
   padding: 6px 19px;
 }
