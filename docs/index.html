@@ -144,7 +144,7 @@ function throttle() {
   window.clearTimeout(throttleTimer);
     throttleTimer = window.setTimeout(function() {
       sizeUp();
-    }, 200);
+    }, 300);
 }
 
 d3.csv("files.csv", function(metadata){
