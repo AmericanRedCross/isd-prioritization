@@ -127,7 +127,7 @@
 d3.select(window).on("resize", throttle);
 
 function sizeUp(){
-
+  console.log("sizeUp!")
   d3.select('#thumbs').selectAll('.thumbnail').style("height", "100%")
   d3.select('#thumbs').selectAll('.row').each(function(d){
     var height = 0;
@@ -162,9 +162,9 @@ d3.csv("files.csv", function(metadata){
       if(count === 4){ count = 0 }
     });
     $('#thumbs').append(html);
+    $(document).load(throttle());
 });
 
-$(document).ready(throttle());
 
 </script>
 
