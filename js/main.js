@@ -1,6 +1,6 @@
 d3.select(window).on("resize", throttle);
 
-var svg, g, world, countryData, programSectors;
+var svg, g, world, places, countryData, programSectors;
 var scoreLookup = {};
 var sliders = [];
 
@@ -39,7 +39,9 @@ function setup(width,height){
       .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
       // .call(zoom);
-  g = svg.append("g");
+  countries = svg.append("g").classed("map-countries", true);
+  cities = svg.append("g").classed("map-cities", true);
+  labels = svg.append("g").classed("map-labels", true);
 }
 
 setup(width,height);
@@ -166,9 +168,16 @@ function buildTable(){
         $('#tooltip').empty();
       });
 
-  grabGeoData()
+  grabCities();
 }
 
+function grabCities(){
+  d3.csv("data/ne_110m_cities.csv", function(error, data) {
+    if (error) throw error;
+      places = data;
+      grabGeoData()
+  })
+}
 
 function grabGeoData(){
   d3.json("data/ne_50m-simple-topo.json", function(error, data) {
@@ -179,7 +188,7 @@ function grabGeoData(){
 }
 
 function drawGeoData(world){
-  var country = g.selectAll(".country").data(world)
+  var country = countries.selectAll(".country").data(world)
   country.enter().insert("path")
       .attr("class", "country")
       .attr("d", path)
@@ -278,6 +287,7 @@ function updateTable(){
   })
 
     updateMapColors();
+    updateMapLabels();
 }
 
 function updateMapColors(){
@@ -286,7 +296,7 @@ function updateMapColors(){
       d3.min(d3.values(countryData), function(d) { return d.score; }),
       d3.max(d3.values(countryData), function(d) { return d.score; })
     ]);
-  g.selectAll('.country').each(function(d,i){
+  countries.selectAll('.country').each(function(d,i){
     if(scoreLookup[d.properties.iso]){
       d3.select(this).style("fill", function(d){
           return quantize(scoreLookup[d.properties.iso]);
@@ -300,6 +310,51 @@ function updateMapColors(){
     }
   })
 
+}
+
+function updateMapLabels(){
+
+  cities.selectAll(".city").remove();
+  labels.selectAll('.city-label').remove();
+
+  countryData.sort(function(a,b){
+    return d3.descending(a.score, b.score);
+  })
+  var topTwenty = [];
+  for(var i=0;i<15;i++){
+    topTwenty.push(countryData[i].iso3)
+  }
+
+  var city = cities.selectAll(".city").data(places)
+  city.enter().append('circle')
+    .filter(function(d){ return $.inArray(d.adm0_a3, topTwenty) !== -1; })
+    .attr("class", "city city-shadow")
+    .attr("cx", function(d){ return projection([d.lng, d.lat])[0] + 0.5; })
+    .attr("cy", function(d){ return projection([d.lng, d.lat])[1] + 0.5; })
+    .attr("r", 2)
+  city.enter().append('circle')
+    .filter(function(d){ return $.inArray(d.adm0_a3, topTwenty) !== -1; })
+    .attr("class", "city")
+    .attr("cx", function(d){ return projection([d.lng, d.lat])[0]; })
+    .attr("cy", function(d){ return projection([d.lng, d.lat])[1]; })
+    .attr("r", 2)
+
+  var label = labels.selectAll(".city-label").data(places)
+  label.enter().append('text')
+      .filter(function(d){ return $.inArray(d.adm0_a3, topTwenty) !== -1; })
+      .attr("class", "city-label label-shadow")
+      .attr("transform", function(d) { return "translate(" + projection([d.lng, d.lat]) + ")"; })
+      .attr("dy", ".35em")
+      .text(function(d){ return d.name; });
+  label.enter().append('text')
+      .filter(function(d){ return $.inArray(d.adm0_a3, topTwenty) !== -1; })
+      .attr("class", "city-label")
+      .attr("transform", function(d) { return "translate(" + projection([d.lng, d.lat]) + ")"; })
+      .attr("dy", ".35em")
+      .text(function(d){ return d.name; });
+  labels.selectAll('.city-label')
+    .attr("x", function(d) { return d.lng > -1 ? 6 : -6; })
+    .style("text-anchor", function(d) { return d.lng > -1 ? "start" : "end"; });
 }
 
 function redraw() {
@@ -319,7 +374,7 @@ function redraw() {
 //   t[1] = Math.min(height / 2 * (s - 1) + h * s, Math.max(height / 2 * (1 - s) - h * s, t[1]));
 //
 //   zoom.translate(t);
-//   g.style("stroke-width", 1 / s).attr("transform", "translate(" + t + ")scale(" + s + ")");
+//   countries.style("stroke-width", 1 / s).attr("transform", "translate(" + t + ")scale(" + s + ")");
 //
 // }
 
