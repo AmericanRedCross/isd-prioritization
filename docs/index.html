@@ -162,8 +162,9 @@ d3.csv("files.csv", function(metadata){
       if(count === 4){ count = 0 }
     });
     $('#thumbs').append(html);
-    throttle();
 });
+
+$(document).ready(throttle());
 
 </script>
 
