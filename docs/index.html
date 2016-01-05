@@ -155,7 +155,7 @@ d3.csv("files.csv", function(metadata){
       html += (count === 1) ? '<div class="row" style="text-align:center;">' : '';
       html += '<div class="col-xs-6 col-sm-3">' +
         '<a class="thumbnail" href="maps/' + item.filename + '" target="_blank" download>' +
-          '<img src="thumbs/' + item.filename.slice(0,-4) + '_THUMB.png">' +
+          '<img height="155px" src="thumbs/' + item.filename.slice(0,-4) + '_THUMB.png">' +
           '<div class="caption"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> &nbsp;' + item.title + '</div>' +
         '</a></div>';
       html += (count === 4) ? '</div>' : '';
