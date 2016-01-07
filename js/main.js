@@ -3,10 +3,7 @@ d3.select(window).on("resize", throttle);
 var svg, g, world, places, countryData, programSectors;
 var scoreLookup = {};
 var sliders = [];
-
-// var zoom = d3.behavior.zoom()
-//     .scaleExtent([1, 8])
-//     .on("zoom", move);
+var groupToggles = document.getElementsByClassName('toggle-group');
 
 var defaultFill = '#d7d7d8';
 
@@ -53,15 +50,15 @@ var quantize = d3.scale.quantize()
     // http://bl.ocks.org/mbostock/raw/5577023/
 
 var weightings = {
-  "need": 5, // ## category
+  "need": 1, // ## category (0 or 1)
   "disasters": 3, // sub
   "vuln": 1, // sub
   "coping": 1, // sub
   "pop": 2, // sub
-  "funding": 2, // ## category
+  "funding": 1, // ## category (0 or 1)
   "oda": 4, // sub
   "recip": 1, // sub
-  "entry": 2, // ## category
+  "entry": 1, // ## category (0 or 1)
   "ifrc": 3, // sub
   "isd": 1, // sub
   "deploy": 1, // sub
@@ -72,6 +69,7 @@ var weightings = {
 var oneDecimal = d3.format(".2n");
 
 function setupSliders(){
+  // only the subcategories have elements on the page classed sliders
   sliders = document.getElementsByClassName('sliders');
   for ( var i = 0; i < sliders.length; i++ ) {
     var category = $(sliders[i]).attr("id");
@@ -82,10 +80,7 @@ function setupSliders(){
       step: 1,
       tooltip: true,
   		orientation: "horizontal",
-  		range: {
-  			'min': 0,
-  			'max': 5
-  		}
+  		range: { 'min':0, 'max':10 }
   	});
 
   	// Bind the color changing function to the slide event.
@@ -208,13 +203,20 @@ function drawGeoData(world){
 }
 
 function setWeighting(){
+
+  $(groupToggles).each(function(index, item){
+    var category = $(item).attr("id");
+    var weight = ($(item).hasClass("fa-toggle-on")) ? 1 : 0;
+    weightings[category] = weight;
+  });
+
   $(sliders).each(function(index, item){
     var category = $(item).attr("id");
     var weight = item.noUiSlider.get();
     var spanSelector = ".weight." + category;
     d3.select(spanSelector).html(weight);
     weightings[category] = parseFloat(weight);
-  })
+  });
 
   programSectors = [];
   checkboxes = $("#program-sectors input[type=checkbox]");
@@ -375,20 +377,6 @@ function redraw() {
   drawGeoData(world);
 }
 
-// function move() {
-//
-//   var t = d3.event.translate;
-//   var s = d3.event.scale;
-//   var h = height / 3;
-//
-//   t[0] = Math.min(width / 2 * (s - 1), Math.max(width / 2 * (1 - s), t[0]));
-//   t[1] = Math.min(height / 2 * (s - 1) + h * s, Math.max(height / 2 * (1 - s) - h * s, t[1]));
-//
-//   zoom.translate(t);
-//   countries.style("stroke-width", 1 / s).attr("transform", "translate(" + t + ")scale(" + s + ")");
-//
-// }
-
 function checkedPrograms(change){
   checkboxes = $("#program-sectors input[type=checkbox]");
   if(change === 'all'){
@@ -397,6 +385,16 @@ function checkedPrograms(change){
   if(change === 'none'){
     for (i=0; i<checkboxes.length; i++) { checkboxes[i].checked = false; }
   }
+  setWeighting();
+}
+
+// toggle grouping on or off
+function toggleGroup(el){
+  var toggle = d3.select(el);
+  if(toggle.classed('fa-toggle-on')){
+    toggle.classed({'fa-toggle-on':false, 'fa-toggle-off':true});
+  } else { toggle.classed({'fa-toggle-on':true, 'fa-toggle-off':false}); }
+
   setWeighting();
 }
 
