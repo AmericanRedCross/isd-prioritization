@@ -26,7 +26,7 @@
   <body>
 
     <div id="info-modal" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -36,41 +36,65 @@
 
 <p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our analysis focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
 <p><b><i>Need</i></b> includes natural disaster risk, vulnerability, lack of coping capacity, and population.</p>
-<p><b><i>Funding</i></b> includes ODA and country-specific humanitarian funding.</p>
+<p><b><i>Funding</i></b> includes disbursements and potential donor interest.</p>
 <p><b><i>Ease</i></b> includes the presence of an IFRC country office, number of ISD staff in-country, number of previous ARC disaster deployments, and the lack of human conflict.</p>
 <p>High-conflict countries and OFAC-restricted countries have been removed from analysis. Data were turned into a weighted index. <b>In each map, darker color shading indicates higher values and greater suitability for ISD program activities.</b></p>
 
 <hr>
 
-<p><h5>Natural disasters - 2016 projected disaster risk</h5>
-<small>Data source: 2016 INFORM database v0.2.25.</small></p>
+<p><h5>Disaster exposure - natural disaster risk</h5>
+<small>Data source: INFORM database 2016 v0.2.27</small></p>
 
-<p><h5>Vulnerability - Includes socioeconomics and vulnerable groups.</h5>
-<small>Data source: 2016 INFORM database v0.2.25.</small></p>
+<p><h5>People affected by disasters - total number of people affected by disasters, 1999-2013 </h5>
+<small>Data source: EM-DAT</small></p>
 
-<p><h5>Lack of Coping Capacity - Includes institutional support and existing infrastructure</h5>
-<small>Data source: 2016 INFORM database v0.2.25.</small></p>
+<p><h5>Vulnerability - includes socioeconomics and vulnerable groups</h5>
+<small>Data source: INFORM database 2016 v0.2.27</small></p>
 
-<p><h5>Population - 2013, in millions </h5>
-<small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+<p><h5>Lack of coping capacity - includes institutional support and existing infrastructure</h5>
+<small>Data source: INFORM database 2016 v0.2.27</small></p>
 
-<p><h5>Official Development Assistance - 2012-2013 average, in billions USD </h5>
-<small>Data source: OECD and World Bank. 2013 was the most recent year for which data were available at the time of map production. DAC countries have been excluded from this map.</small></p>
+<p><h5>Percent urban population - people living in urban areas as defined by national statistical offices</h5>
+<small>Data source: United Nations, World Urbanization Prospects 2015</small></p>
 
-<p><h5>Presence of IFRC Office - Indicates ease of entry for ARC operations </h5>
-<small>Data source: ARC, IFRC. Data are accurate as of December 2015.</small></p>
+<p><h5>USAID funding - 2014 disbursements</h5>
+<small>Data source: USAID</small></p>
 
-<p><h5>Previous Emergency Deployments - ARC staff deployed, 2009-2015  </h5>
-<small>Data source: ARC. Data includes emergency deployments from 2009-2015, inclusive.</small></p>
+<p><h5>ODA - Official Development Assistance, 2012-2013 average</h5>
+<small>Data source: OECD and World Bank (2013 was the most recent year for which data were available)</small></p>
 
-<p><h5>Existing ISD Staff - Number of current staff </h5>
-<small>Data source: ARC. Data are accurate as of Dec 2015.</small></p>
+<p><h5>Migrants to the USA - total immigration to the USA by country of origin </h5>
+<small>Data source: Global Bilateral Migration, Last Updated: 06/28/2011</small></p>
 
-<p><h5>Security (Lack of Human Conflict) - Includes current and projected levels </h5>
-<small>Data source: 2016 INFORM database v0.2.25.</small></p>
+<p><h5>Presence of top 25 companies - presence of top 25 companies on the Fortune 500 </h5>
+<small>Data source: websites of companies </small></p>
+
+<p><h5>Presence of IFRC office - existing IFRC office </h5>
+<small>Data source: ARC, IFRC (data updated as of December 2015)</small></p>
+
+<p><h5>ISD staff presence - current ARC staff based in the country </h5>
+<small>Data source: ARC (data updated as of December 2015)</small></p>
+
+<p><h5>ARC disaster deployments - ARC staff deployed, 2009-2015  </h5>
+<small>Data source: ARC (data from 2009-2015, inclusive)</small></p>
+
+<p><h5>ARC disaster money - ARC monetary contributions, 2009-2015  </h5>
+<small>Data source: ARC (data from 2009-2015, inclusive)</small></p>
+
+<p><h5>ARC disaster supplies - ARC supplies donated, 2009-2015  </h5>
+<small>Data source: ARC (data from 2009-2015, inclusive)</small></p>
+
+<p><h5>Security (lack of human conflict) - includes current and projected levels </h5>
+<small>Data source: INFORM database 2016 v0.2.27.</small></p>
+
+<p><h5>CTP response (all appeals) - CTP response implemented as part of an IFRC appeal</h5>
+<small>Data source: IFRC</small></p>
+
+<p><h5>CTP response (ARC) - CTP response implemented with ARC involvement </h5>
+<small>Data source: ARC, IFRC </small></p>
 
 <p><h5>ISD FY16 Programs - Programs being implemented in fiscal year 2016 </h5>
-<small>Data source: ARC. Data are accurate as of 18 Dec 2015. Note that several countries have FY16 programs but were excluded from the analysis for other reasons (such as DAC countries or high conflict). These include: Bahamas, Barbados, Central African Republic, Mexico, Russia, Somalia, Trinidad and Tobago, Uganda, and Ukraine.</small></p>
+<small>Data source: ARC (data updated as of 18 Dec 2015)</small></p>
 
 <hr>
 
@@ -135,12 +159,12 @@
         <h3>Available funding &nbsp;<i id="funding" class="toggle-group fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
         <hr>
         <div class="subcat-group">
-          <!-- <h5 class="subcat">ODA &nbsp; <small><span class="oda weight"></span></small></h5>
-        	<div class="sliders funding" id="oda"></div> -->
           <!-- <h5 class="subcat">Top 21 humanitarian assistance recipients &nbsp; <small><span class="recip weight"></span></small></h5>
         	<div class="sliders funding" id="recip"></div> -->
           <h5 class="subcat">USAID funding &nbsp; <small><span class="usaid weight"></span></small></h5>
           <div class="sliders funding" id="usaid"></div>
+          <h5 class="subcat">ODA &nbsp; <small><span class="oda weight"></span></small></h5>
+          <div class="sliders funding" id="oda"></div>
           <h5 class="subcat">Migrants to USA &nbsp; <small><span class="usmigr weight"></span></small></h5>
           <div class="sliders funding" id="usmigr"></div>
           <h5 class="subcat">Presence of top 25 companies &nbsp; <small><span class="top25 weight"></span></small></h5>
@@ -201,7 +225,7 @@
         </div>
 
       </div>
-      <a class="info-icon" onclick="quickSetSliders('zero')"> zero out all sliders</a> &nbsp; | &nbsp; <a class="info-icon" onclick="quickSetSliders('default')"> default values</a>
+      <a class="info-icon" onclick="quickSetSliders('zero')"> zero out all sliders</a> &nbsp; <small>|</small> &nbsp; <a class="info-icon" onclick="quickSetSliders('default')"> default values</a>
     </div>
 
 <hr>

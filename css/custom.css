@@ -106,6 +106,7 @@
     background-color: rgba(245,245,245,1);
     border-radius: 3px;
     padding: 2px;
+    max-width: 300px;
 }
 #tooltip:empty {
     display:none;

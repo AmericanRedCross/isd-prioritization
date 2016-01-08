@@ -58,7 +58,8 @@ var defaults = {
   coping: { weight: 9, title: "Lack of coping capacity", color:"#3182bd" },
   urban: { weight: 3, title: "Urban population", color:"#08519c" },
   funding: { weight: 1 }, // ## category (0 or 1)
-  usaid: { weight: 4, title: "USAID funding", color:"#74c476" },
+  usaid: { weight: 4, title: "USAID funding", color:"#a1d99b" },
+  oda: { weight: 4, title: "ODA", color:"#74c476" },
   usmigr: { weight: 2, title: "Migrants to USA", color:"#31a354" },
   top25: { weight: 1, title: "Presence of top 25 companies", color:"#006d2c" },
   entry: { weight: 1 }, // ## category (0 or 1)
@@ -79,7 +80,7 @@ for(key in defaults){
   weightings[key] = defaults[key].weight
 }
 
-var graphSegments = ["disasters", "emdat", "vuln", "coping", "urban", "usaid", "usmigr", "top25", "ifrcoffice", "isdstaff", "conflict", "irocpeople", "iroccash", "irocsupp", "ctpall", "ctparc", "fy16"];
+var graphSegments = ["disasters", "emdat", "vuln", "coping", "urban", "usaid", "oda", "usmigr", "top25", "ifrcoffice", "isdstaff", "conflict", "irocpeople", "iroccash", "irocsupp", "ctpall", "ctparc", "fy16"];
 
 $.each(graphSegments, function(i, segment){
   sliderSearch = "#" + segment + ".sliders";
@@ -100,8 +101,9 @@ function quickSetSliders(option){
   setWeighting();
 }
 
-var oneDecimal = d3.format("00.1f");
 var noDecimal = d3.format(",d");
+var oneDecimal = d3.format("00.1f");
+var twoDecimal = d3.format("00.2f");
 
 function setupSliders(){
   // only the subcategories have elements on the page classed sliders
@@ -280,7 +282,7 @@ function adjustScores(){
 
   $.each(countryData, function(countryIndex, country){
     var weightingsSum = (weightings.need * (weightings.urban + weightings.disasters + weightings.vuln + weightings.coping + weightings.emdat)) +
-      (weightings.funding * (weightings.usaid + weightings.top25 + weightings.usmigr)) +
+      (weightings.funding * (weightings.usaid + weightings.oda + weightings.top25 + weightings.usmigr)) +
       (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.irocsupp + weightings.ifrcoffice + weightings.isdstaff + weightings.conflict + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
     country.urbanW = weightings.need * (weightings.urban * country.urban / weightingsSum);
@@ -289,6 +291,7 @@ function adjustScores(){
     country.copingW = weightings.need * (weightings.coping * country.coping / weightingsSum);
     country.emdatW = weightings.need * (weightings.emdat * country.emdat / weightingsSum);
     country.usaidW = weightings.funding * (weightings.usaid * country.usaid / weightingsSum);
+    country.odaW = weightings.funding * (weightings.oda * country.oda / weightingsSum);
     country.top25W = weightings.funding * (weightings.top25 * country.top25 / weightingsSum);
     country.usmigrW = weightings.funding * (weightings.usmigr * country.usmigr / weightingsSum);
     country.ctpallW = weightings.entry * (weightings.ctpall * country.ctpall / weightingsSum);
@@ -308,10 +311,10 @@ function adjustScores(){
     country.fy16W = weightings.entry * (weightings.fy16 * country.fy16 / weightingsSum);
 
     for(var i=0; i<graphSegments.length; i++){
-      subCat = graphSegments[i].id
+      subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.irocsuppW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
+    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.irocsuppW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
 
   });
@@ -333,7 +336,7 @@ function updateTable(){
       segmentWidth = d[graphSegments[i] + "W"] * 10 + "%"
       d3.select(this).select(selector)
         .style('width',segmentWidth)
-        .attr('data-score', oneDecimal(d[graphSegments[i] + "W"]))
+        .attr('data-score', twoDecimal(d[graphSegments[i] + "W"]))
     }
 
   })
