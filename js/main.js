@@ -94,6 +94,7 @@ function quickSetSliders(option){
 }
 
 var oneDecimal = d3.format(".2n");
+var noDecimal = d3.format(",d");
 
 function setupSliders(){
   // only the subcategories have elements on the page classed sliders
@@ -265,7 +266,7 @@ function setWeighting(){
     var category = $(item).attr("id");
     var weight = item.noUiSlider.get();
     var spanSelector = ".weight." + category;
-    d3.select(spanSelector).html(weight);
+    d3.select(spanSelector).html(noDecimal(weight));
     weightings[category] = parseFloat(weight);
   });
 
