@@ -84,6 +84,7 @@ function quickSetSliders(option){
     if(option === 'default'){
       var category = $(item).attr("id");
       item.noUiSlider.set(defaultWeightings[category]);
+      d3.selectAll('.toggle-group').classed({'fa-toggle-on':true, 'fa-toggle-off':false});
     }
     if(option === 'zero'){
       item.noUiSlider.set(0);
