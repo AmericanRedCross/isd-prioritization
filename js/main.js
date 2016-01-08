@@ -293,24 +293,9 @@ function setWeighting(){
 function adjustScores(){
 
   $.each(countryData, function(countryIndex, country){
-
-    var weightingsSum = weightings.urban +
-      weightings.disasters +
-      weightings.vuln +
-      weightings.coping +
-      weightings.emdat +
-      weightings.usaid +
-      weightings.top25 +
-      weightings.usmigr +
-      weightings.ctpall +
-      weightings.ctparc +
-      weightings.iroccash +
-      weightings.irocpeople +
-      weightings.irocsupp +
-      weightings.ifrcoffice +
-      weightings.isdstaff +
-      weightings.conflict +
-      weightings.fy16;
+    var weightingsSum = (weightings.need * (weightings.urban + weightings.disasters + weightings.vuln + weightings.coping + weightings.emdat)) +
+      (weightings.funding * (weightings.usaid + weightings.top25 + weightings.usmigr)) +
+      (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.irocsupp + weightings.ifrcoffice + weightings.isdstaff + weightings.conflict + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
     country.urbanW = weightings.need * (weightings.urban * country.urban / weightingsSum);
     country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
