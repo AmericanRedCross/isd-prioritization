@@ -124,29 +124,6 @@
 <script src="../js/d3.min.js"></script> <!-- v3.5.10 -->
 <script>
 
-// d3.select(window).on("resize", throttle);
-//
-// function sizeUp(){
-//   console.log("sizeUp!")
-//   d3.select('#thumbs').selectAll('.thumbnail').style("height", "100%")
-//   d3.select('#thumbs').selectAll('.row').each(function(d){
-//     var height = 0;
-//     d3.select(this).selectAll('.thumbnail').each(function(d){
-//       if($(this).outerHeight() > height){ height = $(this).outerHeight() }
-//     });
-//     d3.select(this).selectAll('.thumbnail').style("height", height + "px")
-//   })
-//
-// }
-
-// var throttleTimer;
-// function throttle() {
-//   window.clearTimeout(throttleTimer);
-//     throttleTimer = window.setTimeout(function() {
-//       sizeUp();
-//     }, 300);
-// }
-
 d3.csv("files.csv", function(metadata){
     var html = "";
     var count = 0;
@@ -164,7 +141,6 @@ d3.csv("files.csv", function(metadata){
     $('#thumbs').append(html);
     $('img').load(throttle());
 });
-
 
 </script>
 

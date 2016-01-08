@@ -6,6 +6,7 @@ var sliders = [];
 var groupToggles = document.getElementsByClassName('toggle-group');
 
 var defaultFill = '#d7d7d8';
+var zeroFill = '#000000';
 
 var width, height;
 
@@ -49,22 +50,47 @@ var quantize = d3.scale.quantize()
     // Every ColorBrewer Scale
     // http://bl.ocks.org/mbostock/raw/5577023/
 
-var weightings = {
+var defaultWeightings = {
   "need": 1, // ## category (0 or 1)
-  "disasters": 3, // sub
-  "vuln": 1, // sub
-  "coping": 1, // sub
-  "pop": 2, // sub
+  "urban": 3,
+  "disasters": 8,
+  "vuln": 9,
+  "coping": 9,
+  "emdat": 5,
+  "usaid": 4,
   "funding": 1, // ## category (0 or 1)
-  "oda": 4, // sub
-  "recip": 1, // sub
+  "top25": 1,
+  "usmigr": 2,
   "entry": 1, // ## category (0 or 1)
-  "ifrc": 3, // sub
-  "isd": 1, // sub
-  "deploy": 1, // sub
-  "conflict": 1, // sub
-  "fy16": 0 // sub
+  "ctpall": 4,
+  "ctparc": 0,
+  "iroccash": 2,
+  "irocpeople": 5,
+  "irocsupp": 2,
+  "ifrcoffice": 7,
+  "isdstaff": 3,
+  "conflict": 8,
+  "fy16": 0
 };
+// copy the object so we can store new weightings but also keep track of the defaults
+// for reset witout page refresh
+var weightings={}
+for(key in defaultWeightings){
+  weightings[key] = defaultWeightings[key]
+}
+
+function quickSetSliders(option){
+  $(sliders).each(function(index, item){
+    if(option === 'default'){
+      var category = $(item).attr("id");
+      item.noUiSlider.set(defaultWeightings[category]);
+    }
+    if(option === 'zero'){
+      item.noUiSlider.set(0);
+    }
+  });
+  setWeighting();
+}
 
 var oneDecimal = d3.format(".2n");
 
@@ -90,30 +116,40 @@ function setupSliders(){
   grabData();
 }
 
+function getNumber(str){
+  return (isNaN(parseFloat(str))) ? 0 : parseFloat(str);
+}
+
 function grabData(){
-  d3.csv("data/prioritization-data.csv", function(d){
+  d3.csv("data/prioritizin-data.csv", function(d){
     return {
       iso3: d.iso3,
       country: d.country,
       need: 0,
-      disasters: parseFloat(d.disasters),
-      vuln: parseFloat(d.vuln),
-      coping: parseFloat(d.coping),
-      pop: parseFloat(d.pop),
+      urban: getNumber(d.urban), //
+      disasters: getNumber(d.disasters), //
+      vuln: getNumber(d.vuln), //
+      coping: getNumber(d.coping), //
+      emdat: getNumber(d.emdat), //
       funding: 0,
-      oda: parseFloat(d.oda),
-      recip: parseFloat(d.recip),
+      usaid: getNumber(d.usaid), //
+      top25: getNumber(d.top25), //
+      usmigr: getNumber(d.usmigr), //
       entry: 0,
-      ifrc: parseFloat(d.ifrc),
-      isd: parseFloat(d.isd),
-      deploy: parseFloat(d.deploy),
-      conflict: 10 - parseFloat(d.conflict),
-      cbh: parseFloat(d.cbh),
-      drr: parseFloat(d.drr),
-      measles: parseFloat(d.measles),
-      resilience: parseFloat(d.resilience),
-      od: parseFloat(d.od),
-      urbandp: parseFloat(d.urbandp)
+      ctpall: getNumber(d.ctpall), //
+      ctparc: getNumber(d.ctparc), //
+      iroccash: getNumber(d.iroccash), //
+      irocpeople: getNumber(d.irocpeople), //
+      irocsupp: getNumber(d.irocsupp), //
+      ifrcoffice: getNumber(d.ifrcoffice), //
+      isdstaff: getNumber(d.isdstaff), //
+      conflict: getNumber(d.conflict), //
+      fy16cbh: getNumber(d.fy16cbh), //
+      fy16dr: getNumber(d.fy16dr), //
+      fy16measles: getNumber(d.fy16measles), //
+      fy16resilience: getNumber(d.fy16resilience), //
+      fy16od: getNumber(d.fy16od), //
+      fy16urbandp: getNumber(d.fy16urbandp) //
     };
   }, function(error, rows) {
     countryData = rows;
@@ -123,18 +159,31 @@ function grabData(){
 }
 
 var graphSegments = [
-  {id:"disastersW",details:{label:"Disasters",color:"#6baed6"}},
-  {id:"vulnW",details:{label:"Vulnerability",color:"#4292c6"}},
-  {id:"copingW",details:{label:"Lack of coping capacity",color:"#2171b5"}},
-  {id:"popW",details:{label:"Population",color:"#08519c"}},
-  {id:"odaW",details:{label:"ODA",color:"#41ab5d"}},
-  {id:"recipW",details:{label:"Top 21",color:"#238b45"}},
-  {id:"ifrcW",details:{label:"IFRC office",color:"#dadaeb"}},
-  {id:"isdW",details:{label:"ISD staff",color:"#bcbddc"}},
-  {id:"deployW",details:{label:"ARC deployments",color:"#9e9ac8"}},
-  {id:"conflictW",details:{label:"Conflict (lack of)",color:"#807dba"}},
-  {id:"fy16W",details:{label:"ISD FY16 programs",color:"#6a51a3"}}
+  {id:"disastersW",details:{label:"Disasters",color:"#c6dbef"}},
+  {id:"emdatW",details:{label:"People affected by disasters",color:"#9ecae1"}},
+  {id:"vulnW",details:{label:"Vulnerability",color:"#6baed6"}},
+  {id:"copingW",details:{label:"Lack of coping capacity",color:"#3182bd"}},
+  {id:"urbanW",details:{label:"Urban population",color:"#08519c"}},
+  {id:"usaidW",details:{label:"USAID funding",color:"#74c476"}},
+  {id:"usmigrW",details:{label:"Migrants to USA",color:"#31a354"}},
+  {id:"top25W",details:{label:"Presence of top 25 companies",color:"#006d2c"}},
+  {id:"ifrcofficeW",details:{label:"IFRC office",color:"#f7fcfd"}},
+  {id:"isdstaffW",details:{label:"ISD staff",color:"#e0ecf4"}},
+  {id:"conflictW",details:{label:"Security",color:"#bfd3e6"}},
+  {id:"irocpeopleW",details:{label:"ARC disaster deployments",color:"#9ebcda"}},
+  {id:"iroccashW",details:{label:"ARC disaster cash",color:"#8c96c6"}},
+  {id:"irocsuppW",details:{label:"ARC disaster supplies",color:"#8c6bb1"}},
+  {id:"ctpallW",details:{label:"CTP (all appeals)",color:"#88419d"}},
+  {id:"ctparcW",details:{label:"CTP (ARC)",color:"#810f7c"}},
+  {id:"fy16W",details:{label:"ISD FY16 programs",color:"#4d004b"}}
 ];
+
+$.each(graphSegments, function(i, segment){
+  sliderSearch = "#" + segment.id.slice(0,-1) + ".sliders";
+  $(sliderSearch).css("background", segment.details.color)
+});
+
+
 var rows;
 
 function buildTable(){
@@ -204,6 +253,7 @@ function drawGeoData(world){
 
 function setWeighting(){
 
+
   $(groupToggles).each(function(index, item){
     var category = $(item).attr("id");
     var weight = ($(item).hasClass("fa-toggle-on")) ? 1 : 0;
@@ -243,39 +293,78 @@ function setWeighting(){
 function adjustScores(){
 
   $.each(countryData, function(countryIndex, country){
-    var needWeightingsSum = weightings.disasters + weightings.vuln + weightings.coping + weightings.pop;
-    var fundingWeightingsSum = weightings.oda + weightings.recip;
-    var entryWeightingsSum = weightings.ifrc + weightings.isd + weightings.deploy + weightings.conflict + weightings.fy16;
-    var categoryWeightingsSum = weightings.need + weightings.funding + weightings.entry;
 
-    country.disastersW =  weightings.need * (weightings.disasters * country.disasters / needWeightingsSum) / categoryWeightingsSum;
-    country.vulnW = weightings.need * (weightings.vuln * country.vuln / needWeightingsSum) / categoryWeightingsSum;
-    country.copingW = weightings.need * (weightings.coping * country.coping / needWeightingsSum) / categoryWeightingsSum;
-    country.popW = weightings.need * (weightings.pop * country.pop / needWeightingsSum) / categoryWeightingsSum;
-    country.odaW = weightings.funding * (weightings.oda * country.oda / fundingWeightingsSum) / categoryWeightingsSum;
-    country.recipW = weightings.funding * (weightings.recip * country.recip / fundingWeightingsSum) / categoryWeightingsSum;
-    country.ifrcW = weightings.entry * (weightings.ifrc * country.ifrc / entryWeightingsSum) / categoryWeightingsSum;
-    country.isdW = weightings.entry * (weightings.isd * country.isd / entryWeightingsSum) / categoryWeightingsSum;
-    country.deployW = weightings.entry * (weightings.deploy * country.deploy / entryWeightingsSum) / categoryWeightingsSum;
-    country.conflictW = weightings.entry * (weightings.conflict * country.conflict / entryWeightingsSum) / categoryWeightingsSum;
+    var weightingsSum = weightings.urban +
+      weightings.disasters +
+      weightings.vuln +
+      weightings.coping +
+      weightings.emdat +
+      weightings.usaid +
+      weightings.top25 +
+      weightings.usmigr +
+      weightings.ctpall +
+      weightings.ctparc +
+      weightings.iroccash +
+      weightings.irocpeople +
+      weightings.irocsupp +
+      weightings.ifrcoffice +
+      weightings.isdstaff +
+      weightings.conflict +
+      weightings.fy16;
+    // weightings need/funding/entry will all be 1-0 for on-off
+    country.urbanW = weightings.need * (weightings.urban * country.urban / weightingsSum);
+    country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
+    country.vulnW = weightings.need * (weightings.vuln * country.vuln / weightingsSum);
+    country.copingW = weightings.need * (weightings.coping * country.coping / weightingsSum);
+    country.emdatW = weightings.need * (weightings.emdat * country.emdat / weightingsSum);
+    country.usaidW = weightings.funding * (weightings.usaid * country.usaid / weightingsSum);
+    country.top25W = weightings.funding * (weightings.top25 * country.top25 / weightingsSum);
+    country.usmigrW = weightings.funding * (weightings.usmigr * country.usmigr / weightingsSum);
+    country.ctpallW = weightings.entry * (weightings.ctpall * country.ctpall / weightingsSum);
+    country.ctparcW = weightings.entry * (weightings.ctparc * country.ctparc / weightingsSum);
+    country.iroccashW = weightings.entry * (weightings.iroccash * country.iroccash / weightingsSum);
+    country.irocpeopleW = weightings.entry * (weightings.irocpeople * country.irocpeople / weightingsSum);
+    country.irocsuppW = weightings.entry * (weightings.irocsupp * country.irocsupp / weightingsSum);
+    country.ifrcofficeW = weightings.entry * (weightings.ifrcoffice * country.ifrcoffice / weightingsSum);
+    country.isdstaffW = weightings.entry * (weightings.isdstaff * country.isdstaff / weightingsSum);
+    country.conflictW = weightings.entry * (weightings.conflict * country.conflict / weightingsSum);
     var programs = false;
+    // programSectors is an array built from checked program sectors
     $(programSectors).each(function(sectorIndex, sector){
       if(country[sector] != 0){ programs = true; }
     });
     country.fy16 = (programs === true) ? 10 : 0;
-    country.fy16W = weightings.entry * (weightings.fy16 * country.fy16 / entryWeightingsSum) / categoryWeightingsSum;
+    country.fy16W = weightings.entry * (weightings.fy16 * country.fy16 / weightingsSum);
 
     for(var i=0; i<graphSegments.length; i++){
       subCat = graphSegments[i].id
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-
-    country.score = country.disastersW + country.vulnW + country.copingW + country.popW + country.odaW + country.recipW + country.ifrcW + country.isdW + country.deployW  + country.conflictW + country.fy16W;
+    country.score = country.urbanW +
+      country.disastersW +
+      country.vulnW +
+      country.copingW +
+      country.emdatW +
+      country.usaidW +
+      country.top25W +
+      country.usmigrW +
+      country.ctpallW +
+      country.ctparcW +
+      country.iroccashW +
+      country.irocpeopleW +
+      country.irocsuppW +
+      country.ifrcofficeW +
+      country.isdstaffW +
+      country.conflictW +
+      country.fy16W;
     scoreLookup[country.iso3] = country.score;
+
+
   });
 
   updateTable();
 }
+
 
 
 function updateTable(){
@@ -309,8 +398,9 @@ function updateMapColors(){
       d3.min(d3.values(countryData), function(d) { return d.score; }),
       d3.max(d3.values(countryData), function(d) { return d.score; })
     ]);
+  if(quantize.domain()[0] === 0 && quantize.domain()[1] === 0) {quantize.domain([0,1])}
   countries.selectAll('.country').each(function(d,i){
-    if(scoreLookup[d.properties.iso]){
+    if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
       d3.select(this).style("fill", function(d){
           return quantize(scoreLookup[d.properties.iso]);
         })
