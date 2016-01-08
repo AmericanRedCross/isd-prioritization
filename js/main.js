@@ -100,7 +100,7 @@ function quickSetSliders(option){
   setWeighting();
 }
 
-var oneDecimal = d3.format(".2n");
+var oneDecimal = d3.format("00.1f");
 var noDecimal = d3.format(",d");
 
 function setupSliders(){
@@ -141,12 +141,17 @@ function grabData(){
       fy16od: getNumber(d.fy16od), //
       fy16urbandp: getNumber(d.fy16urbandp) //
     }
-    defaultsExclude = ["need", "funding", "entry", "fy16"];
+    var defaultsExclude = ["need", "funding", "entry", "fy16"];
+    var missingData = [];
     for(key in defaults){
       if($.inArray(key, defaultsExclude) === -1){
         rowObject[key] = getNumber(d[key])
+        if(d[key] === "#N/A"){
+          missingData.push(defaults[key].title)
+        }
       }
     }
+    rowObject.missing = missingData;
     return rowObject;
   }, function(error, rows) {
     countryData = rows;
@@ -172,12 +177,22 @@ function buildTable(){
           '" style="background-color:' + defaults[graphSegments[i]].color + '; width:0%;" data-label="' + defaults[graphSegments[i]].title + '" data-score=""></div>';
           graphSegmentsHtml += thisSegmentHtml;
         }
-        html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small> - <span class="score-text"></span></small></div>' + '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
+        html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small>';
+        html += (d.missing.length > 0) ? ' <i class="fa fa-exclamation-circle data-missing-icon" data-missing="' + d.missing.join(", ") + '"></i>' : '';
+        html += ' - <span class="score-text"></span></small></div>' +
+        '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
         return html;
       })
 
       d3.selectAll(".graph-segment").on("mouseover", function(d){
         var tooltipText = "<small><b>" + $(this).attr("data-label") + "</b> - " + $(this).attr("data-score") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+      d3.selectAll(".data-missing-icon").on("mouseover", function(d){
+        var tooltipText = "<small><b>No data available:</b> " + $(this).attr("data-missing") + "</small>";
         $('#tooltip').html(tooltipText);
       }).on("mouseout", function(){
         $('#tooltip').empty();
