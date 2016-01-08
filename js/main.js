@@ -50,40 +50,47 @@ var quantize = d3.scale.quantize()
     // Every ColorBrewer Scale
     // http://bl.ocks.org/mbostock/raw/5577023/
 
-var defaultWeightings = {
-  "need": 1, // ## category (0 or 1)
-  "urban": 3,
-  "disasters": 8,
-  "vuln": 9,
-  "coping": 9,
-  "emdat": 5,
-  "usaid": 4,
-  "funding": 1, // ## category (0 or 1)
-  "top25": 1,
-  "usmigr": 2,
-  "entry": 1, // ## category (0 or 1)
-  "ctpall": 4,
-  "ctparc": 0,
-  "iroccash": 2,
-  "irocpeople": 5,
-  "irocsupp": 2,
-  "ifrcoffice": 7,
-  "isdstaff": 3,
-  "conflict": 8,
-  "fy16": 0
+var defaults = {
+  need: { weight: 1 }, // ## category (0 or 1)
+  disasters: { weight: 8, title: "Disaster exposure", color:"#c6dbef" },
+  emdat: { weight: 5, title: "People affected by disasters", color:"#9ecae1" },
+  vuln: { weight: 9, title: "Vulnerability", color:"#6baed6" },
+  coping: { weight: 9, title: "Lack of coping capacity", color:"#3182bd" },
+  urban: { weight: 3, title: "Urban population", color:"#08519c" },
+  funding: { weight: 1 }, // ## category (0 or 1)
+  usaid: { weight: 4, title: "USAID funding", color:"#74c476" },
+  usmigr: { weight: 2, title: "Migrants to USA", color:"#31a354" },
+  top25: { weight: 1, title: "Presence of top 25 companies", color:"#006d2c" },
+  entry: { weight: 1 }, // ## category (0 or 1)
+  ifrcoffice: { weight: 7, title: "IFRC office", color:"#f7fcfd" },
+  isdstaff: { weight: 3, title: "ISD staff presence", color:"#e0ecf4" },
+  conflict: { weight: 8, title: "Security", color:"#bfd3e6" },
+  irocpeople: { weight: 5, title: "ARC disaster deployments", color:"#9ebcda" },
+  iroccash: { weight: 2, title: "ARC disaster money", color:"#8c96c6" },
+  irocsupp: { weight: 2, title: "ARC disaster supplies", color:"#8c6bb1" },
+  ctpall: { weight: 4, title: "CTP response (all appeals)", color:"#88419d" },
+  ctparc: { weight: 0, title: "CTP response (ARC)", color:"#810f7c" },
+  fy16: { weight: 0, title: "ISD FY16 programs", color:"#4d004b"}
 };
 // copy the object so we can store new weightings but also keep track of the defaults
 // for reset witout page refresh
 var weightings={}
-for(key in defaultWeightings){
-  weightings[key] = defaultWeightings[key]
+for(key in defaults){
+  weightings[key] = defaults[key].weight
 }
+
+var graphSegments = ["disasters", "emdat", "vuln", "coping", "urban", "usaid", "usmigr", "top25", "ifrcoffice", "isdstaff", "conflict", "irocpeople", "iroccash", "irocsupp", "ctpall", "ctparc", "fy16"];
+
+$.each(graphSegments, function(i, segment){
+  sliderSearch = "#" + segment + ".sliders";
+  $(sliderSearch).css("background", defaults[segment].color)
+});
 
 function quickSetSliders(option){
   $(sliders).each(function(index, item){
     if(option === 'default'){
       var category = $(item).attr("id");
-      item.noUiSlider.set(defaultWeightings[category]);
+      item.noUiSlider.set(defaults[category].weight);
       d3.selectAll('.toggle-group').classed({'fa-toggle-on':true, 'fa-toggle-off':false});
     }
     if(option === 'zero'){
@@ -124,67 +131,29 @@ function getNumber(str){
 
 function grabData(){
   d3.csv("data/prioritizin-data.csv", function(d){
-    return {
+    var rowObject = {
       iso3: d.iso3,
       country: d.country,
-      need: 0,
-      urban: getNumber(d.urban), //
-      disasters: getNumber(d.disasters), //
-      vuln: getNumber(d.vuln), //
-      coping: getNumber(d.coping), //
-      emdat: getNumber(d.emdat), //
-      funding: 0,
-      usaid: getNumber(d.usaid), //
-      top25: getNumber(d.top25), //
-      usmigr: getNumber(d.usmigr), //
-      entry: 0,
-      ctpall: getNumber(d.ctpall), //
-      ctparc: getNumber(d.ctparc), //
-      iroccash: getNumber(d.iroccash), //
-      irocpeople: getNumber(d.irocpeople), //
-      irocsupp: getNumber(d.irocsupp), //
-      ifrcoffice: getNumber(d.ifrcoffice), //
-      isdstaff: getNumber(d.isdstaff), //
-      conflict: getNumber(d.conflict), //
       fy16cbh: getNumber(d.fy16cbh), //
       fy16dr: getNumber(d.fy16dr), //
       fy16measles: getNumber(d.fy16measles), //
       fy16resilience: getNumber(d.fy16resilience), //
       fy16od: getNumber(d.fy16od), //
       fy16urbandp: getNumber(d.fy16urbandp) //
-    };
+    }
+    defaultsExclude = ["need", "funding", "entry", "fy16"];
+    for(key in defaults){
+      if($.inArray(key, defaultsExclude) === -1){
+        rowObject[key] = getNumber(d[key])
+      }
+    }
+    return rowObject;
   }, function(error, rows) {
     countryData = rows;
 
     buildTable();
   });
 }
-
-var graphSegments = [
-  {id:"disastersW",details:{label:"Disasters",color:"#c6dbef"}},
-  {id:"emdatW",details:{label:"People affected by disasters",color:"#9ecae1"}},
-  {id:"vulnW",details:{label:"Vulnerability",color:"#6baed6"}},
-  {id:"copingW",details:{label:"Lack of coping capacity",color:"#3182bd"}},
-  {id:"urbanW",details:{label:"Urban population",color:"#08519c"}},
-  {id:"usaidW",details:{label:"USAID funding",color:"#74c476"}},
-  {id:"usmigrW",details:{label:"Migrants to USA",color:"#31a354"}},
-  {id:"top25W",details:{label:"Presence of top 25 companies",color:"#006d2c"}},
-  {id:"ifrcofficeW",details:{label:"IFRC office",color:"#f7fcfd"}},
-  {id:"isdstaffW",details:{label:"ISD staff",color:"#e0ecf4"}},
-  {id:"conflictW",details:{label:"Security",color:"#bfd3e6"}},
-  {id:"irocpeopleW",details:{label:"ARC disaster deployments",color:"#9ebcda"}},
-  {id:"iroccashW",details:{label:"ARC disaster cash",color:"#8c96c6"}},
-  {id:"irocsuppW",details:{label:"ARC disaster supplies",color:"#8c6bb1"}},
-  {id:"ctpallW",details:{label:"CTP (all appeals)",color:"#88419d"}},
-  {id:"ctparcW",details:{label:"CTP (ARC)",color:"#810f7c"}},
-  {id:"fy16W",details:{label:"ISD FY16 programs",color:"#4d004b"}}
-];
-
-$.each(graphSegments, function(i, segment){
-  sliderSearch = "#" + segment.id.slice(0,-1) + ".sliders";
-  $(sliderSearch).css("background", segment.details.color)
-});
-
 
 var rows;
 
@@ -199,8 +168,8 @@ function buildTable(){
       .html(function(d){
         graphSegmentsHtml = "";
         for(var i=0; i<graphSegments.length; i++){
-          var thisSegmentHtml = '<div class="graph-segment ' + graphSegments[i].id +
-          '" style="background-color:' + graphSegments[i].details.color + '; width:0%;" data-label="' + graphSegments[i].details.label + '" data-score=""></div>';
+          var thisSegmentHtml = '<div class="graph-segment ' + graphSegments[i] + "W" +
+          '" style="background-color:' + defaults[graphSegments[i]].color + '; width:0%;" data-label="' + defaults[graphSegments[i]].title + '" data-score=""></div>';
           graphSegmentsHtml += thisSegmentHtml;
         }
         html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small> - <span class="score-text"></span></small></div>' + '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
@@ -327,25 +296,8 @@ function adjustScores(){
       subCat = graphSegments[i].id
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.urbanW +
-      country.disastersW +
-      country.vulnW +
-      country.copingW +
-      country.emdatW +
-      country.usaidW +
-      country.top25W +
-      country.usmigrW +
-      country.ctpallW +
-      country.ctparcW +
-      country.iroccashW +
-      country.irocpeopleW +
-      country.irocsuppW +
-      country.ifrcofficeW +
-      country.isdstaffW +
-      country.conflictW +
-      country.fy16W;
+    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.irocsuppW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
-
 
   });
 
@@ -362,11 +314,11 @@ function updateTable(){
   rows.each(function(d){
     d3.select(this).select('.score-text').text(oneDecimal(d.score));
     for(var i=0; i<graphSegments.length; i++){
-      selector = ".graph-segment." + graphSegments[i].id
-      segmentWidth = d[graphSegments[i].id] * 10 + "%"
+      selector = ".graph-segment." + graphSegments[i] + "W";
+      segmentWidth = d[graphSegments[i] + "W"] * 10 + "%"
       d3.select(this).select(selector)
         .style('width',segmentWidth)
-        .attr('data-score', oneDecimal(d[graphSegments[i].id]))
+        .attr('data-score', oneDecimal(d[graphSegments[i] + "W"]))
     }
 
   })
