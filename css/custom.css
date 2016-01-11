@@ -34,6 +34,15 @@
   text-align:center;
   margin-bottom: -50px;
 }
+.fy16-locator {
+  r: 5;
+  fill: rgba(0,75,121,0);
+  stroke-width: 1.5px;
+  stroke: rgba(0,75,121,1);
+}
+.fy16-locator.hide {
+  display: none;
+}
 .city {
   fill: black;
   pointer-events: none;

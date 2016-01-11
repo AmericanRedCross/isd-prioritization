@@ -1,6 +1,6 @@
 d3.select(window).on("resize", throttle);
 
-var svg, g, world, places, countryData, programSectors;
+var svg, g, world, fy16sectors, places, countryData, programSectors;
 var scoreLookup = {};
 var sliders = [];
 var groupToggles = document.getElementsByClassName('toggle-group');
@@ -40,6 +40,7 @@ function setup(width,height){
   countries = svg.append("g").classed("map-countries", true);
   cities = svg.append("g").classed("map-cities", true);
   labels = svg.append("g").classed("map-labels", true);
+  programs = svg.append("g").classed("program-markers", true);
 }
 
 setup(width,height);
@@ -215,11 +216,67 @@ function grabGeoData(){
   d3.json("data/ne_50m-simple-topo.json", function(error, data) {
     if (error) throw error;
     world = topojson.feature(data, data.objects.ne_50m).features;
-    drawGeoData(world);
+
+    // to the properties of each country shape add {'fy16': {'fy16cbh':10, 'fy16dr':0, ...}}
+    fy16sectors = [];
+    checkboxes = $("#program-sectors input[type=checkbox]");
+    for (i=0; i<checkboxes.length; i++) {
+        var prgObj = {}
+        prgObj.key = checkboxes[i].value;
+        prgObj.label = $(checkboxes[i]).parent().text();
+        fy16sectors.push(prgObj)
+    }
+    $(countryData).each(function(a, country){
+      $(world).each(function(b, geo){
+        if(geo.properties.iso === country.iso3){
+          geo.properties.fy16 = {};
+          fy16sectors.forEach(function(sector){
+            geo.properties.fy16[sector.key] = country[sector.key]
+          })
+        }
+      })
+    })
+
+
+    drawFy16();
   });
 }
 
-function drawGeoData(world){
+function drawFy16(){
+  var program = programs.selectAll(".programs")
+    .data(world.filter(function(geo){
+      var include = false;
+      fy16sectors.forEach(function(sector){
+        if(geo.properties.fy16 !== undefined){
+          if(geo.properties.fy16[sector.key] > 0){ include = true; }
+        }
+      })
+      return include;
+    }))
+  program.enter().append('circle')
+      .attr("cx", function(d){ return (path.centroid(d))[0]; })
+      .attr("cy", function(d){ return (path.centroid(d))[1]; })
+      .attr("class", "fy16-locator hide")
+      .on("mouseover", function(d){
+        var tooltipText = "<strong>" + d.properties.name + " - <small>";
+        var score = d3.select(this).attr('data-score');
+        tooltipText += score ? oneDecimal(d3.select(this).attr('data-score')) : 'n/a';
+        tooltipText += "</small></strong>";
+        var thisSectorArray = [];
+        $.each(fy16sectors, function(i, sector){
+          if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
+        });
+        tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
+        $('#tooltip').append(tooltipText);
+      })
+      .on("mouseout", function(d){
+        $('#tooltip').empty();
+      });
+
+    drawGeoData();
+}
+
+function drawGeoData(){
   var country = countries.selectAll(".country").data(world)
   country.enter().insert("path")
       .attr("class", "country")
@@ -370,6 +427,14 @@ function updateMapColors(){
     }
   })
 
+  programs.selectAll('.fy16-locator').each(function(d,i){
+    if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
+      d3.select(this).attr('data-score', scoreLookup[d.properties.iso])
+    } else {
+      d3.select(this).attr('data-score', '');
+    }
+  });
+
 }
 
 function updateMapLabels(){
@@ -433,6 +498,22 @@ function checkedPrograms(change){
     for (i=0; i<checkboxes.length; i++) { checkboxes[i].checked = false; }
   }
   setWeighting();
+}
+
+var showPrograms = false;
+function togglePrograms(el){
+  var toggle = d3.select(el).select('i');
+    if(toggle.classed('fa-eye')){
+      toggle.classed({'fa-eye':false, 'fa-eye-slash':true});
+      d3.select('#toggle-prgs-label').text('hide FY16 programs');
+      d3.selectAll('.fy16-locator').classed('hide',false);
+      showPrograms = true;
+    } else {
+      toggle.classed({'fa-eye':true, 'fa-eye-slash':false});
+      d3.select('#toggle-prgs-label').text('show FY16 programs');
+      d3.selectAll('.fy16-locator').classed('hide',true);
+      showPrograms = false;
+    }
 }
 
 // toggle grouping on or off
