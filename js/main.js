@@ -256,7 +256,7 @@ function drawFy16(){
   program.enter().append('circle')
       .attr("cx", function(d){ return (path.centroid(d))[0]; })
       .attr("cy", function(d){ return (path.centroid(d))[1]; })
-      .attr("class", "fy16-locator hide")
+      .attr("class", "fy16-locator")
       .on("mouseover", function(d){
         var tooltipText = "<strong>" + d.properties.name + " - <small>";
         var score = d3.select(this).attr('data-score');
@@ -272,6 +272,7 @@ function drawFy16(){
       .on("mouseout", function(d){
         $('#tooltip').empty();
       });
+    if(showPrograms === false){ d3.selectAll(".fy16-locator").classed('hide',true)}
 
     drawGeoData();
 }
@@ -486,7 +487,7 @@ function redraw() {
   setDimensions();
   d3.select('svg').remove();
   setup(width,height);
-  drawGeoData(world);
+  drawFy16();
 }
 
 function checkedPrograms(change){
