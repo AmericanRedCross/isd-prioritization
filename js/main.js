@@ -1,6 +1,6 @@
 d3.select(window).on("resize", throttle);
 
-var svg, g, world, fy16sectors, places, countryData, programSectors;
+var svg, g, world, fy16sectors, places, countryData, programSectors, rankingArray;
 var scoreLookup = {};
 var sliders = [];
 var groupToggles = document.getElementsByClassName('toggle-group');
@@ -260,7 +260,7 @@ function drawFy16(){
       .on("mouseover", function(d){
         var tooltipText = "<strong>" + d.properties.name + " - <small>";
         var score = d3.select(this).attr('data-score');
-        tooltipText += score ? oneDecimal(d3.select(this).attr('data-score')) : 'n/a';
+        tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(this).attr('data-rank') : 'n/a';
         tooltipText += "</small></strong>";
         var thisSectorArray = [];
         $.each(fy16sectors, function(i, sector){
@@ -286,7 +286,7 @@ function drawGeoData(){
       .on("mouseover", function(d){
         var tooltipText = "<strong>" + d.properties.name + " - <small>";
         var score = d3.select(this).attr('data-score');
-        tooltipText += score ? oneDecimal(d3.select(this).attr('data-score')) : 'n/a';
+        tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(this).attr('data-rank') : 'n/a';
         tooltipText += "</small></strong>";
         $('#tooltip').append(tooltipText);
       })
@@ -338,6 +338,7 @@ function setWeighting(){
 
 function adjustScores(){
 
+  rankingArray = []
   $.each(countryData, function(countryIndex, country){
     var weightingsSum = (weightings.need * (weightings.urban + weightings.disasters + weightings.vuln + weightings.coping + weightings.emdat)) +
       (weightings.funding * (weightings.usaid + weightings.oda + weightings.top25 + weightings.usmigr)) +
@@ -374,8 +375,13 @@ function adjustScores(){
     }
     country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.irocsuppW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
+    if($.inArray(country.score, rankingArray) === -1){rankingArray.push(country.score)}
 
   });
+
+  rankingArray.sort(function(a, b) {
+    return b - a;
+  })
 
   updateTable();
 }
@@ -416,10 +422,13 @@ function updateMapColors(){
   if(quantize.domain()[0] === 0 && quantize.domain()[1] === 0) {quantize.domain([0,1])}
   countries.selectAll('.country').each(function(d,i){
     if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
+      // index starts at 0, ranking starts at 1, so add 1
+      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArray) + 1;
       d3.select(this).style("fill", function(d){
           return quantize(scoreLookup[d.properties.iso]);
         })
         .attr('data-score', scoreLookup[d.properties.iso])
+        .attr('data-rank', rank);
     } else {
       d3.select(this).style("fill", function(d){
         return defaultFill;
@@ -430,7 +439,10 @@ function updateMapColors(){
 
   programs.selectAll('.fy16-locator').each(function(d,i){
     if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
+      // index starts at 0, ranking starts at 1, so add 1
+      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArray) + 1;
       d3.select(this).attr('data-score', scoreLookup[d.properties.iso])
+        .attr('data-rank', rank);
     } else {
       d3.select(this).attr('data-score', '');
     }
