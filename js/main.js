@@ -60,16 +60,15 @@ var defaults = {
   urban: { weight: 3, title: "Urban population", color:"#08519c" },
   funding: { weight: 1 }, // ## category (0 or 1)
   usaid: { weight: 4, title: "USAID funding", color:"#a1d99b" },
-  oda: { weight: 4, title: "ODA", color:"#74c476" },
+  oda: { weight: 1, title: "ODA", color:"#74c476" },
   usmigr: { weight: 2, title: "Migrants to USA", color:"#31a354" },
   top25: { weight: 1, title: "Presence of top 25 companies", color:"#006d2c" },
   entry: { weight: 1 }, // ## category (0 or 1)
-  ifrcoffice: { weight: 7, title: "IFRC office", color:"#f7fcfd" },
-  isdstaff: { weight: 3, title: "ISD staff presence", color:"#e0ecf4" },
-  conflict: { weight: 8, title: "Security", color:"#bfd3e6" },
-  irocpeople: { weight: 5, title: "ARC disaster deployments", color:"#9ebcda" },
-  iroccash: { weight: 2, title: "ARC disaster money", color:"#8c96c6" },
-  irocsupp: { weight: 2, title: "ARC disaster supplies", color:"#8c6bb1" },
+  ifrcoffice: { weight: 7, title: "IFRC office", color:"#e0ecf4" },
+  isdstaff: { weight: 3, title: "ISD staff presence", color:"#bfd3e6" },
+  conflict: { weight: 8, title: "Security", color:"#9ebcda" },
+  irocpeople: { weight: 5, title: "ARC disaster deployments", color:"#8c96c6" },
+  iroccash: { weight: 2, title: "ARC disaster money", color:"#8c6bb1" },
   ctpall: { weight: 4, title: "CTP response (all appeals)", color:"#88419d" },
   ctparc: { weight: 0, title: "CTP response (ARC)", color:"#810f7c" },
   fy16: { weight: 0, title: "ISD FY16 programs", color:"#4d004b"}
@@ -81,7 +80,7 @@ for(key in defaults){
   weightings[key] = defaults[key].weight
 }
 
-var graphSegments = ["disasters", "emdat", "vuln", "coping", "urban", "usaid", "oda", "usmigr", "top25", "ifrcoffice", "isdstaff", "conflict", "irocpeople", "iroccash", "irocsupp", "ctpall", "ctparc", "fy16"];
+var graphSegments = ["disasters", "emdat", "vuln", "coping", "urban", "usaid", "oda", "usmigr", "top25", "ifrcoffice", "isdstaff", "conflict", "irocpeople", "iroccash", "ctpall", "ctparc", "fy16"];
 
 $.each(graphSegments, function(i, segment){
   sliderSearch = "#" + segment + ".sliders";
@@ -342,7 +341,7 @@ function adjustScores(){
   $.each(countryData, function(countryIndex, country){
     var weightingsSum = (weightings.need * (weightings.urban + weightings.disasters + weightings.vuln + weightings.coping + weightings.emdat)) +
       (weightings.funding * (weightings.usaid + weightings.oda + weightings.top25 + weightings.usmigr)) +
-      (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.irocsupp + weightings.ifrcoffice + weightings.isdstaff + weightings.conflict + weightings.fy16));
+      (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.ifrcoffice + weightings.isdstaff + weightings.conflict + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
     country.urbanW = weightings.need * (weightings.urban * country.urban / weightingsSum);
     country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
@@ -357,7 +356,6 @@ function adjustScores(){
     country.ctparcW = weightings.entry * (weightings.ctparc * country.ctparc / weightingsSum);
     country.iroccashW = weightings.entry * (weightings.iroccash * country.iroccash / weightingsSum);
     country.irocpeopleW = weightings.entry * (weightings.irocpeople * country.irocpeople / weightingsSum);
-    country.irocsuppW = weightings.entry * (weightings.irocsupp * country.irocsupp / weightingsSum);
     country.ifrcofficeW = weightings.entry * (weightings.ifrcoffice * country.ifrcoffice / weightingsSum);
     country.isdstaffW = weightings.entry * (weightings.isdstaff * country.isdstaff / weightingsSum);
     country.conflictW = weightings.entry * (weightings.conflict * country.conflict / weightingsSum);
@@ -373,7 +371,7 @@ function adjustScores(){
       subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.irocsuppW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
+    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.ifrcofficeW + country.isdstaffW + country.conflictW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
     if($.inArray(country.score, rankingArray) === -1){rankingArray.push(country.score)}
 
