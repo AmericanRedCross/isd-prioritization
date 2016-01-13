@@ -414,7 +414,7 @@ function updateTable(){
   })
 
   rows.sort(function(a,b){
-    return d3.descending(a.score, b.score);
+    return b.score - a.score;
   })
 
     updateMapColors();
@@ -464,7 +464,7 @@ function updateMapLabels(){
   labels.selectAll('.city-label').remove();
 
   countryData.sort(function(a,b){
-    return d3.descending(a.score, b.score);
+    return b.score - a.score;
   })
   var topTwenty = [];
   for(var i=0;i<15;i++){
