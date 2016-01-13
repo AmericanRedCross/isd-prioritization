@@ -136,6 +136,7 @@ function grabData(){
     var rowObject = {
       iso3: d.iso3,
       country: d.country,
+      ofac: d.ofac,
       fy16cbh: getNumber(d.fy16cbh), //
       fy16dr: getNumber(d.fy16dr), //
       fy16measles: getNumber(d.fy16measles), //
@@ -180,7 +181,9 @@ function buildTable(){
           graphSegmentsHtml += thisSegmentHtml;
         }
         html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small>';
-        html += (d.missing.length > 0) ? ' <i class="fa fa-exclamation-circle data-missing-icon" data-missing="' + d.missing.join(", ") + '"></i>' : '';
+        html += (d.ofac === "comprehensive") ? ' <i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#941c20;" data-ofac="' + d.ofac + '"></i>' : '';
+        html += (d.ofac === "targeted") ? ' <i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#94551c;" data-ofac="' + d.ofac + '"></i>' : '';
+        html += (d.missing.length > 0) ? ' <i class="fa fa-info fa-fw data-missing-icon" data-missing="' + d.missing.join(", ") + '"></i>' : '';
         html += ' - <span class="score-text"></span></small></div>' +
         '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
         return html;
@@ -195,6 +198,13 @@ function buildTable(){
 
       d3.selectAll(".data-missing-icon").on("mouseover", function(d){
         var tooltipText = "<small><b>No data available:</b> " + $(this).attr("data-missing") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+      d3.selectAll(".ofac-sanctions-icon").on("mouseover", function(d){
+        var tooltipText = "<small>" + $(this).attr("data-ofac") + " OFAC sanctions</small>";
         $('#tooltip').html(tooltipText);
       }).on("mouseout", function(){
         $('#tooltip').empty();
