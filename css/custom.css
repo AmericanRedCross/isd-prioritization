@@ -34,12 +34,26 @@
   text-align:center;
   margin-bottom: -50px;
 }
+.staff-icon {
+  color: #3d3d3e;
+}
+.fy16-icon {
+  color: #3d3d3e;
+}
 .fy16-locator {
   fill: rgba(0,75,121,0);
   stroke-width: 1.5px;
   stroke: rgba(0,75,121,1);
 }
 .fy16-locator.hide {
+  display: none;
+}
+.staff-locator {
+  fill: rgba(0,75,121,0);
+  stroke-width: 1.5px;
+  stroke: rgba(236,183,49,1);
+}
+.staff-locator.hide {
   display: none;
 }
 .city {

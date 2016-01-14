@@ -5,6 +5,16 @@ var scoreLookup = {};
 var sliders = [];
 var groupToggles = document.getElementsByClassName('toggle-group');
 
+var fy16sectors = [];
+var checkboxes = $("#program-sectors input[type=checkbox]");
+for (i=0; i<checkboxes.length; i++) {
+    var prgObj = {}
+    prgObj.key = checkboxes[i].value;
+    prgObj.label = $(checkboxes[i]).parent().text();
+    fy16sectors.push(prgObj)
+}
+
+
 var defaultFill = '#d7d7d8';
 var zeroFill = '#000000';
 
@@ -40,6 +50,7 @@ function setup(width,height){
   countries = svg.append("g").classed("map-countries", true);
   cities = svg.append("g").classed("map-cities", true);
   labels = svg.append("g").classed("map-labels", true);
+  staffs = svg.append("g").classed("staff-markers", true);
   programs = svg.append("g").classed("program-markers", true);
 }
 
@@ -136,6 +147,8 @@ function grabData(){
     var rowObject = {
       iso3: d.iso3,
       country: d.country,
+      staffcount: getNumber(d.staffcount),
+      staffcity: d.staffcity,
       ofac: d.ofac,
       fy16cbh: getNumber(d.fy16cbh), //
       fy16dr: getNumber(d.fy16dr), //
@@ -180,17 +193,55 @@ function buildTable(){
           '" style="background-color:' + defaults[graphSegments[i]].color + '; width:0%;" data-label="' + defaults[graphSegments[i]].title + '" data-score=""></div>';
           graphSegmentsHtml += thisSegmentHtml;
         }
-        html = '<div class="col-sm-4 graph-text-col">' + d.country + ' <small>';
-        html += (d.ofac === "comprehensive") ? ' <i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#941c20;" data-ofac="' + d.ofac + '"></i>' : '';
-        html += (d.ofac === "targeted") ? ' <i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#94551c;" data-ofac="' + d.ofac + '"></i>' : '';
-        html += (d.missing.length > 0) ? ' <i class="fa fa-info fa-fw data-missing-icon" data-missing="' + d.missing.join(", ") + '"></i>' : '';
-        html += ' - <span class="score-text"></span></small></div>' +
+        html = '<div class="col-sm-4 graph-text-col">' + d.country + ' ';
+        var thisSectorArray = [];
+        $.each(fy16sectors, function(i, sector){
+          if(d[sector.key] > 0){ thisSectorArray.push(sector.label); }
+        });
+        if(thisSectorArray.length > 0){
+          html += '<i class="fa fa-cog fa-fw fy16-icon" data-fy16="' + thisSectorArray.sort(d3.ascending).join("<br> ") + '"></i>';
+        }
+        if(d.staffcount > 0){
+          html += (d.staffcount === 1) ? '<i class="fa fa-user fa-fw staff-icon" data-staffcount="' + d.staffcount + '" data-staffcity="' + d.staffcity + '"></i>' :
+            '<i class="fa fa-users fa-fw staff-icon" data-staffcount="' + d.staffcount + '" data-staffcity="' + d.staffcity + '"></i>';
+        }
+        html += (d.ofac === "comprehensive") ? '<i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#941c20;" data-ofac="' + d.ofac + '"></i>' : '';
+        html += (d.ofac === "targeted") ? '<i class="fa fa-exclamation-triangle ofac-sanctions-icon fa-fw" style="color:#94551c;" data-ofac="' + d.ofac + '"></i>' : '';
+        html += (d.missing.length > 0) ? '<i class="fa fa-info fa-fw data-missing-icon" data-missing="' + d.missing.join(", ") + '"></i>' : '';
+        html += ' - <span class="score-text"></span></div>' +
         '<div class="col-sm-8 graph-bar-col">' + graphSegmentsHtml  + "</div></div>";
         return html;
       })
 
+      // if(showStaff === true && d.properties.staffcount > 0){
+      //   tooltipText += '<br><small>';
+      //   tooltipText += (d.properties.staffcount === 1) ? '<i class="fa fa-user fa-fw"></i> ' : '<i class="fa fa-users fa-fw"></i> ';
+      //   tooltipText += d.properties.staffcount + ' / ' + d.properties.staffcity + '</small>';
+      // }
+      // if(showPrograms === true){
+        // var thisSectorArray = [];
+        // $.each(fy16sectors, function(i, sector){
+        //   if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
+        // });
+        // tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
+      // }
+
       d3.selectAll(".graph-segment").on("mouseover", function(d){
         var tooltipText = "<small><b>" + $(this).attr("data-label") + "</b> - " + $(this).attr("data-score") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+      d3.selectAll(".fy16-icon").on("mouseover", function(d){
+        var tooltipText = "<small><b>FY16 programs:</b><br>" + $(this).attr("data-fy16") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+      d3.selectAll(".staff-icon").on("mouseover", function(d){
+        var tooltipText = "<small><b>ISD staff:</b> " + $(this).attr("data-staffcount") + ' / ' + $(this).attr("data-staffcity") + "</small>";
         $('#tooltip').html(tooltipText);
       }).on("mouseout", function(){
         $('#tooltip').empty();
@@ -225,19 +276,13 @@ function grabGeoData(){
   d3.json("data/ne_50m-simple-topo.json", function(error, data) {
     if (error) throw error;
     world = topojson.feature(data, data.objects.ne_50m).features;
-
-    // to the properties of each country shape add {'fy16': {'fy16cbh':10, 'fy16dr':0, ...}}
-    fy16sectors = [];
-    checkboxes = $("#program-sectors input[type=checkbox]");
-    for (i=0; i<checkboxes.length; i++) {
-        var prgObj = {}
-        prgObj.key = checkboxes[i].value;
-        prgObj.label = $(checkboxes[i]).parent().text();
-        fy16sectors.push(prgObj)
-    }
+    // # to the properties of each country shape add data on programs {'fy16': {'fy16cbh':10, 'fy16dr':0, ...}}
+    // # and also on staff numbers/city
     $(countryData).each(function(a, country){
       $(world).each(function(b, geo){
         if(geo.properties.iso === country.iso3){
+          geo.properties.staffcount = country.staffcount;
+          geo.properties.staffcity = country.staffcity;
           geo.properties.fy16 = {};
           fy16sectors.forEach(function(sector){
             geo.properties.fy16[sector.key] = country[sector.key]
@@ -247,12 +292,12 @@ function grabGeoData(){
     })
 
 
-    drawFy16();
+    drawLayers();
   });
 }
 
-function drawFy16(){
-  var program = programs.selectAll(".programs")
+function drawLayers(){
+  programs.selectAll(".programs")
     .data(world.filter(function(geo){
       var include = false;
       fy16sectors.forEach(function(sector){
@@ -261,28 +306,34 @@ function drawFy16(){
         }
       })
       return include;
-    }))
-  program.enter().append('circle')
+    })).enter().append('circle')
       .attr("cx", function(d){ return (path.centroid(d))[0]; })
       .attr("cy", function(d){ return (path.centroid(d))[1]; })
-      .attr("class", "fy16-locator")
-      .attr("r", 5)
+      .attr("class", "locator fy16-locator")
+      .attr("r", 4)
       .on("mouseover", function(d){
-        var tooltipText = "<strong>" + d.properties.name + " - <small>";
-        var score = d3.select(this).attr('data-score');
-        tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(this).attr('data-rank') : 'n/a';
-        tooltipText += "</small></strong>";
-        var thisSectorArray = [];
-        $.each(fy16sectors, function(i, sector){
-          if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
-        });
-        tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
-        $('#tooltip').append(tooltipText);
+        populateMapTooltip(d, this);
       })
       .on("mouseout", function(d){
         $('#tooltip').empty();
       });
     if(showPrograms === false){ d3.selectAll(".fy16-locator").classed('hide',true)}
+
+  staffs.selectAll(".staffs")
+    .data(world.filter(function(geo){
+      return geo.properties.staffcount > 0;
+    })).enter().append('circle')
+      .attr("cx", function(d){ return (path.centroid(d))[0]; })
+      .attr("cy", function(d){ return (path.centroid(d))[1]; })
+      .attr("class", "locator staff-locator")
+      .attr("r", 6)
+      .on("mouseover", function(d){
+        populateMapTooltip(d, this);
+      })
+      .on("mouseout", function(d){
+        $('#tooltip').empty();
+      });
+    if(showStaff === false){ d3.selectAll(".staff-locator").classed('hide',true)}
 
     drawGeoData();
 }
@@ -294,11 +345,7 @@ function drawGeoData(){
       .attr("d", path)
       .style("fill", defaultFill)
       .on("mouseover", function(d){
-        var tooltipText = "<strong>" + d.properties.name + " - <small>";
-        var score = d3.select(this).attr('data-score');
-        tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(this).attr('data-rank') : 'n/a';
-        tooltipText += "</small></strong>";
-        $('#tooltip').append(tooltipText);
+        populateMapTooltip(d, this);
       })
       .on("mouseout", function(d){
         $('#tooltip').empty();
@@ -446,7 +493,7 @@ function updateMapColors(){
     }
   })
 
-  programs.selectAll('.fy16-locator').each(function(d,i){
+  svg.selectAll('.locator').each(function(d,i){
     if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
       // index starts at 0, ranking starts at 1, so add 1
       var rank = $.inArray(scoreLookup[d.properties.iso], rankingArray) + 1;
@@ -508,7 +555,7 @@ function redraw() {
   setDimensions();
   d3.select('svg').remove();
   setup(width,height);
-  drawFy16();
+  drawLayers();
 }
 
 function checkedPrograms(change){
@@ -520,6 +567,42 @@ function checkedPrograms(change){
     for (i=0; i<checkboxes.length; i++) { checkboxes[i].checked = false; }
   }
   setWeighting();
+}
+
+function populateMapTooltip(d, el){
+  var tooltipText = "<strong>" + d.properties.name + " - <small>";
+  var score = d3.select(el).attr('data-score');
+  tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(el).attr('data-rank') : 'n/a';
+  tooltipText += "</small></strong>";
+  if(showStaff === true && d.properties.staffcount > 0){
+    tooltipText += '<br><small>';
+    tooltipText += (d.properties.staffcount === 1) ? '<i class="fa fa-user fa-fw"></i> ' : '<i class="fa fa-users fa-fw"></i> ';
+    tooltipText += d.properties.staffcount + ' / ' + d.properties.staffcity + '</small>';
+  }
+  if(showPrograms === true){
+    var thisSectorArray = [];
+    $.each(fy16sectors, function(i, sector){
+      if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
+    });
+    tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
+  }
+  $('#tooltip').append(tooltipText);
+}
+
+var showStaff = false;
+function toggleStaff(el){
+  var toggle = d3.select(el).select('i');
+    if(toggle.classed('fa-eye')){
+      toggle.classed({'fa-eye':false, 'fa-eye-slash':true});
+      d3.select('#toggle-staff-label').text('hide staff');
+      d3.selectAll('.staff-locator').classed('hide',false);
+      showStaff = true;
+    } else {
+      toggle.classed({'fa-eye':true, 'fa-eye-slash':false});
+      d3.select('#toggle-staff-label').text('show staff');
+      d3.selectAll('.staff-locator').classed('hide',true);
+      showStaff = false;
+    }
 }
 
 var showPrograms = false;
