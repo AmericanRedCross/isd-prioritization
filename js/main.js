@@ -266,6 +266,7 @@ function drawFy16(){
       .attr("cx", function(d){ return (path.centroid(d))[0]; })
       .attr("cy", function(d){ return (path.centroid(d))[1]; })
       .attr("class", "fy16-locator")
+      .attr("r", 5)
       .on("mouseover", function(d){
         var tooltipText = "<strong>" + d.properties.name + " - <small>";
         var score = d3.select(this).attr('data-score');
