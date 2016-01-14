@@ -69,7 +69,8 @@ var defaults = {
   coping: { weight: 9, title: "Insti/infra weakness", color:"#4292c6" },
   emdat: { weight: 5, title: "People affected by disasters", color:"#6baed6" },
   vuln: { weight: 9, title: "Socio-eco/demo vulnerability", color:"#9ecae1" },
-  urban: { weight: 3, title: "Urban population", color:"#c6dbef" },
+  popurban: { weight: 2, title: "Urban population", color:"#c6dbef" },
+  poptotal: { weight: 0, title: "Total population", color:"#deebf7" },
   funding: { weight: 1 }, // ## category (0 or 1)
   usaid: { weight: 4, title: "USAID", color:"#006d2c" },
   usmigr: { weight: 2, title: "High migration to USA", color:"#238b45" },
@@ -92,7 +93,7 @@ for(key in defaults){
   weightings[key] = defaults[key].weight
 }
 
-var graphSegments = ["disasters","conflict","coping","emdat","vuln","urban","usaid","usmigr","top25","oda","security","ifrcoffice","irocpeople","iroccash","ctpall","ctparc","isdstaff","fy16"];
+var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usaid","usmigr","top25","oda","security","ifrcoffice","irocpeople","iroccash","ctpall","ctparc","isdstaff","fy16"];
 
 $.each(graphSegments, function(i, segment){
   sliderSearch = "#" + segment + ".sliders";
@@ -214,19 +215,6 @@ function buildTable(){
         return html;
       })
 
-      // if(showStaff === true && d.properties.staffcount > 0){
-      //   tooltipText += '<br><small>';
-      //   tooltipText += (d.properties.staffcount === 1) ? '<i class="fa fa-user fa-fw"></i> ' : '<i class="fa fa-users fa-fw"></i> ';
-      //   tooltipText += d.properties.staffcount + ' / ' + d.properties.staffcity + '</small>';
-      // }
-      // if(showPrograms === true){
-        // var thisSectorArray = [];
-        // $.each(fy16sectors, function(i, sector){
-        //   if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
-        // });
-        // tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
-      // }
-
       d3.selectAll(".graph-segment").on("mouseover", function(d){
         var tooltipText = "<small><b>" + $(this).attr("data-label") + "</b> - " + $(this).attr("data-score") + "</small>";
         $('#tooltip').html(tooltipText);
@@ -291,7 +279,6 @@ function grabGeoData(){
         }
       })
     })
-
 
     drawLayers();
   });
@@ -398,11 +385,12 @@ function adjustScores(){
 
   rankingArray = []
   $.each(countryData, function(countryIndex, country){
-    var weightingsSum = (weightings.need * (weightings.urban + weightings.disasters + weightings.conflict + weightings.vuln + weightings.coping + weightings.emdat)) +
+    var weightingsSum = (weightings.need * (weightings.popurban + weightings.poptotal + weightings.disasters + weightings.conflict + weightings.vuln + weightings.coping + weightings.emdat)) +
       (weightings.funding * (weightings.usaid + weightings.oda + weightings.top25 + weightings.usmigr)) +
       (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.ifrcoffice + weightings.isdstaff + weightings.security + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
-    country.urbanW = weightings.need * (weightings.urban * country.urban / weightingsSum);
+    country.popurbanW = weightings.need * (weightings.popurban * country.popurban / weightingsSum);
+    country.poptotalW = weightings.need * (weightings.poptotal * country.poptotal / weightingsSum);
     country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
     country.conflictW =  weightings.need * (weightings.conflict * country.conflict / weightingsSum);
     country.vulnW = weightings.need * (weightings.vuln * country.vuln / weightingsSum);
@@ -431,7 +419,7 @@ function adjustScores(){
       subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.urbanW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.ifrcofficeW + country.isdstaffW + country.securityW + country.fy16W;
+    country.score = country.popurbanW + country.poptotalW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.ifrcofficeW + country.isdstaffW + country.securityW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
     if($.inArray(country.score, rankingArray) === -1){rankingArray.push(country.score)}
 
