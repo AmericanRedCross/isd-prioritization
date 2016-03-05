@@ -140,3 +140,29 @@
 #tooltip:empty {
     display:none;
 }
+
+#disasters {
+  cursor: default;
+}
+#conflict {
+  cursor: default;
+}
+#coping {
+  cursor: default;
+}
+#emdat {
+  cursor: default;
+}
+
+#disasters .noUi-handle {
+  display: none;
+}
+#conflict .noUi-handle {
+  display: none;
+}
+#coping .noUi-handle {
+  display: none;
+}
+#emdat .noUi-handle {
+  display: none;
+}

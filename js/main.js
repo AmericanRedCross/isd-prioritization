@@ -64,27 +64,22 @@ var quantize = d3.scale.quantize()
 
 var defaults = {
   need: { weight: 1 }, // ## category (0 or 1)
-  disasters: { weight: 8, title: "Natural disaster exposure", color:"#08519c" },
-  conflict: { weight: 1, title: "Conflict", color:"#2171b5" },
-  coping: { weight: 9, title: "Insti/infra weakness", color:"#4292c6" },
+  disasters: { weight: 9, title: "Natural disaster exposure", color:"#08519c" },
+  conflict: { weight: 4, title: "Conflict", color:"#2171b5" },
+  coping: { weight: 5, title: "Insti/infra weakness", color:"#4292c6" },
   emdat: { weight: 5, title: "People affected by disasters", color:"#6baed6" },
   vuln: { weight: 9, title: "Socio-eco/demo vulnerability", color:"#9ecae1" },
   popurban: { weight: 2, title: "Urban population", color:"#c6dbef" },
   poptotal: { weight: 0, title: "Total population", color:"#deebf7" },
   funding: { weight: 1 }, // ## category (0 or 1)
   usaid: { weight: 4, title: "USAID", color:"#006d2c" },
-  usmigr: { weight: 2, title: "High migration to USA", color:"#238b45" },
-  top25: { weight: 1, title: "Presence of top 25 companies", color:"#41ab5d" },
-  oda: { weight: 1, title: "ODA", color:"#74c476" },
+  usmigr: { weight: 0, title: "High migration to USA", color:"#238b45" },
+  top25: { weight: 0, title: "Presence of top 25 companies", color:"#41ab5d" },
   entry: { weight: 1 }, // ## category (0 or 1)
   security: { weight: 8, title: "Security", color:"#4d004b" },
-  ifrcoffice: { weight: 7, title: "IFRC office", color:"#810f7c" },
-  irocpeople: { weight: 5, title: "ARC disaster deployments", color:"#88419d" },
-  iroccash: { weight: 2, title: "ARC disaster money", color:"#8c6bb1" },
-  ctpall: { weight: 4, title: "CTP response (all appeals)", color:"#8c96c6" },
-  ctparc: { weight: 0, title: "CTP response (ARC)", color:"#9ebcda" },
-  isdstaff: { weight: 3, title: "ISD staff presence", color:"#bfd3e6" },
-  fy16: { weight: 0, title: "ISD FY16 programs", color:"#e0ecf4"}
+  ifrcoffice: { weight: 5, title: "IFRC office", color:"#810f7c" },
+  isdstaff: { weight: 3, title: "ISD staff presence", color:"#88419d" },
+  fy16: { weight: 5, title: "ISD FY16 programs", color:"#8c6bb1"}
 };
 // copy the object so we can store new weightings but also keep track of the defaults
 // for reset witout page refresh
@@ -93,7 +88,7 @@ for(key in defaults){
   weightings[key] = defaults[key].weight
 }
 
-var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usaid","usmigr","top25","oda","security","ifrcoffice","irocpeople","iroccash","ctpall","ctparc","isdstaff","fy16"];
+var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usaid","usmigr","top25","security","ifrcoffice","isdstaff","fy16"];
 
 $.each(graphSegments, function(i, segment){
   sliderSearch = "#" + segment + ".sliders";
@@ -386,8 +381,8 @@ function adjustScores(){
   rankingArray = []
   $.each(countryData, function(countryIndex, country){
     var weightingsSum = (weightings.need * (weightings.popurban + weightings.poptotal + weightings.disasters + weightings.conflict + weightings.vuln + weightings.coping + weightings.emdat)) +
-      (weightings.funding * (weightings.usaid + weightings.oda + weightings.top25 + weightings.usmigr)) +
-      (weightings.entry * (weightings.ctpall + weightings.ctparc + weightings.iroccash + weightings.irocpeople + weightings.ifrcoffice + weightings.isdstaff + weightings.security + weightings.fy16));
+      (weightings.funding * (weightings.usaid + weightings.top25 + weightings.usmigr)) +
+      (weightings.entry * (weightings.ifrcoffice + weightings.isdstaff + weightings.security + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
     country.popurbanW = weightings.need * (weightings.popurban * country.popurban / weightingsSum);
     country.poptotalW = weightings.need * (weightings.poptotal * country.poptotal / weightingsSum);
@@ -397,13 +392,8 @@ function adjustScores(){
     country.copingW = weightings.need * (weightings.coping * country.coping / weightingsSum);
     country.emdatW = weightings.need * (weightings.emdat * country.emdat / weightingsSum);
     country.usaidW = weightings.funding * (weightings.usaid * country.usaid / weightingsSum);
-    country.odaW = weightings.funding * (weightings.oda * country.oda / weightingsSum);
     country.top25W = weightings.funding * (weightings.top25 * country.top25 / weightingsSum);
     country.usmigrW = weightings.funding * (weightings.usmigr * country.usmigr / weightingsSum);
-    country.ctpallW = weightings.entry * (weightings.ctpall * country.ctpall / weightingsSum);
-    country.ctparcW = weightings.entry * (weightings.ctparc * country.ctparc / weightingsSum);
-    country.iroccashW = weightings.entry * (weightings.iroccash * country.iroccash / weightingsSum);
-    country.irocpeopleW = weightings.entry * (weightings.irocpeople * country.irocpeople / weightingsSum);
     country.ifrcofficeW = weightings.entry * (weightings.ifrcoffice * country.ifrcoffice / weightingsSum);
     country.isdstaffW = weightings.entry * (weightings.isdstaff * country.isdstaff / weightingsSum);
     country.securityW = weightings.entry * (weightings.security * country.security / weightingsSum);
@@ -419,7 +409,7 @@ function adjustScores(){
       subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.popurbanW + country.poptotalW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.odaW + country.top25W + country.usmigrW + country.ctpallW + country.ctparcW + country.iroccashW + country.irocpeopleW + country.ifrcofficeW + country.isdstaffW + country.securityW + country.fy16W;
+    country.score = country.popurbanW + country.poptotalW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.top25W + country.usmigrW + country.ifrcofficeW + country.isdstaffW + country.securityW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
     if($.inArray(country.score, rankingArray) === -1){rankingArray.push(country.score)}
 
