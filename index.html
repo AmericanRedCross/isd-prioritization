@@ -34,16 +34,18 @@
           </div>
           <div class="modal-body">
 
-<p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our analysis focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
+<p>The GIS team investigated a number of factors that affect how suitable different countries are for ISD involvement and assistance. Our search for data focused on each country’s level of need, the availability of external country-specific funding, and the ease of ISD entry and operations.</p>
 <p><b><i>Need</i></b> includes natural disaster risk, vulnerability, lack of coping capacity, and population.</p>
 <p><b><i>Funding</i></b> includes disbursements and potential donor interest.</p>
 <p><b><i>Ease</i></b> includes the presence of an IFRC country office, number of ISD staff in-country, number of previous ARC disaster deployments, and the lack of human conflict.</p>
-<p>High-conflict countries and OFAC-restricted countries have been removed from analysis. Data were turned into a weighted index. <b>In each map, darker color shading indicates higher values and greater suitability for ISD program activities.</b></p>
 
 <hr>
 
-<p><h5>Disaster exposure - natural disaster risk and human conflict (current and projected levels)</h5>
+<p><h5>Disaster (natural) exposure - natural disaster risk and human conflict (current and projected levels)</h5>
 <small>Data source: INFORM database 2016 v0.2.27</small></p>
+
+<p><h5>Conflict - includes current and projected levels </h5>
+<small>Data source: INFORM database 2016 v0.2.27.</small></p>
 
 <p><h5>Institutional/ infrastructure weakness - lack of coping capacity in regards to institutional support and existing infrastructure</h5>
 <small>Data source: INFORM database 2016 v0.2.27</small></p>
@@ -118,17 +120,15 @@
 
 
     <div id="title"><h2 style="margin: 0 0 6px 0;">ISD Prioritization</h2>
-      <p><small>
-      <span class="info-icon" onclick="$('#info-modal').modal();">
-        <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>  source info
-      </span>&nbsp; | &nbsp;
-        <a class="info-icon" href="docs"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> maps for print</a>
-      </small></p>
-      <p><small><span class="info-icon" onclick="togglePrograms(this);">
-        <i class="fa fa-eye"></i> <span id="toggle-prgs-label">show FY16 programs</span>
+      <small><span class="info-icon" onclick="$('#info-modal').modal();">
+        <i class="fa fa-fw fa-info-circle"></i> source info</span>
+      </small>
+      <hr class="hr-small">
+      <small><span class="info-icon" onclick="togglePrograms(this);">
+        <i class="fa fa-fw fa-eye"></i> <span id="toggle-prgs-label">show FY16 programs</span>
       </span><br><span class="info-icon" onclick="toggleStaff(this);">
-        <i class="fa fa-eye"></i> <span id="toggle-staff-label">show staff</span>
-      </span></small></p>
+        <i class="fa fa-fw fa-eye"></i> <span id="toggle-staff-label">show staff</span>
+      </span></small>
     </div>
 
   <img id="logo" src="images/arc_logo.png">
