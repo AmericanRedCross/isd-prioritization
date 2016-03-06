@@ -15,8 +15,11 @@
 .subcat {
   margin-left: 10px;
 }
-.toggle-group {
+.group-toggle, .region-toggle {
   cursor: pointer;
+}
+.inactive-region {
+  color: #777;
 }
 .country {
   fill: #d7d7d8;

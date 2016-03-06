@@ -1,9 +1,16 @@
 d3.select(window).on("resize", throttle);
 
-var svg, g, world, fy16sectors, places, countryData, programSectors, rankingArray;
+var svg, g, world, fy16sectors, places, countryData, programSectors;
+var rankingArrays = {
+  world: [],
+  lac: [],
+  africa: [],
+  amee: []
+};
 var scoreLookup = {};
 var sliders = [];
-var groupToggles = document.getElementsByClassName('toggle-group');
+var groupToggles = document.getElementsByClassName('group-toggle');
+var regionToggles =  document.getElementsByClassName('region-toggle');
 
 var fy16sectors = [];
 var checkboxes = $("#program-sectors input[type=checkbox]");
@@ -88,6 +95,8 @@ for(key in defaults){
   weightings[key] = defaults[key].weight
 }
 
+var regionFilter = "world";
+
 var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usaid","usmigr","top25","security","ifrcoffice","isdstaff","fy16"];
 
 $.each(graphSegments, function(i, segment){
@@ -142,6 +151,7 @@ function getNumber(str){
 function grabData(){
   d3.csv("data/prioritizin-data.csv", function(d){
     var rowObject = {
+      region: d.region,
       iso3: d.iso3,
       country: d.country,
       staffcount: getNumber(d.staffcount),
@@ -265,6 +275,7 @@ function grabGeoData(){
     $(countryData).each(function(a, country){
       $(world).each(function(b, geo){
         if(geo.properties.iso === country.iso3){
+          geo.properties.region = country.region;
           geo.properties.staffcount = country.staffcount;
           geo.properties.staffcity = country.staffcity;
           geo.properties.fy16 = {};
@@ -346,6 +357,8 @@ function setWeighting(){
     weightings[category] = weight;
   });
 
+  regionFilter = $(".region-toggle.fa-toggle-on").attr("id");
+
   $(sliders).each(function(index, item){
     var category = $(item).attr("id");
     var weight = item.noUiSlider.get();
@@ -378,25 +391,29 @@ function setWeighting(){
 
 function adjustScores(){
 
-  rankingArray = []
+  rankingArrays.world = [];
+  rankingArrays.lac = [];
+  rankingArrays.africa = [];
+  rankingArrays.amee = [];
+
   $.each(countryData, function(countryIndex, country){
-    var weightingsSum = (weightings.need * (weightings.popurban + weightings.poptotal + weightings.disasters + weightings.conflict + weightings.vuln + weightings.coping + weightings.emdat)) +
+    var weightingsSum = (weightings.need * (weightings.disasters + weightings.conflict + weightings.coping + weightings.emdat + weightings.vuln + weightings.popurban + weightings.poptotal)) +
       (weightings.funding * (weightings.usaid + weightings.top25 + weightings.usmigr)) +
       (weightings.entry * (weightings.ifrcoffice + weightings.isdstaff + weightings.security + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
-    country.popurbanW = weightings.need * (weightings.popurban * country.popurban / weightingsSum);
-    country.poptotalW = weightings.need * (weightings.poptotal * country.poptotal / weightingsSum);
     country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
     country.conflictW =  weightings.need * (weightings.conflict * country.conflict / weightingsSum);
-    country.vulnW = weightings.need * (weightings.vuln * country.vuln / weightingsSum);
     country.copingW = weightings.need * (weightings.coping * country.coping / weightingsSum);
     country.emdatW = weightings.need * (weightings.emdat * country.emdat / weightingsSum);
+    country.vulnW = weightings.need * (weightings.vuln * country.vuln / weightingsSum);
+    country.popurbanW = weightings.need * (weightings.popurban * country.popurban / weightingsSum);
+    country.poptotalW = weightings.need * (weightings.poptotal * country.poptotal / weightingsSum);
     country.usaidW = weightings.funding * (weightings.usaid * country.usaid / weightingsSum);
     country.top25W = weightings.funding * (weightings.top25 * country.top25 / weightingsSum);
     country.usmigrW = weightings.funding * (weightings.usmigr * country.usmigr / weightingsSum);
+    country.securityW = weightings.entry * (weightings.security * country.security / weightingsSum);
     country.ifrcofficeW = weightings.entry * (weightings.ifrcoffice * country.ifrcoffice / weightingsSum);
     country.isdstaffW = weightings.entry * (weightings.isdstaff * country.isdstaff / weightingsSum);
-    country.securityW = weightings.entry * (weightings.security * country.security / weightingsSum);
     var programs = false;
     // programSectors is an array built from checked program sectors
     $(programSectors).each(function(sectorIndex, sector){
@@ -409,15 +426,22 @@ function adjustScores(){
       subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.popurbanW + country.poptotalW + country.disastersW + country.vulnW + country.copingW + country.emdatW + country.usaidW + country.top25W + country.usmigrW + country.ifrcofficeW + country.isdstaffW + country.securityW + country.fy16W;
+    country.score = country.disastersW + country.conflictW + country.copingW + country.emdatW + country.vulnW + country.popurbanW + country.poptotalW +  country.usaidW + country.top25W + country.usmigrW + country.securityW + country.ifrcofficeW + country.isdstaffW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
-    if($.inArray(country.score, rankingArray) === -1){rankingArray.push(country.score)}
+    if($.inArray(country.score, rankingArrays.world) === -1){rankingArrays.world.push(country.score)}
+    var regions = ["lac","africa","amee"];
+    $.each(regions, function(i,d){
+      if(country.region === d){
+        if($.inArray(country.score, rankingArrays[d]) === -1){ rankingArrays[d].push(country.score) }
+      }
+    });
 
   });
 
-  rankingArray.sort(function(a, b) {
-    return b - a;
-  })
+  rankingArrays.world.sort(function(a, b) { return b - a; })
+  rankingArrays.lac.sort(function(a, b) { return b - a; })
+  rankingArrays.africa.sort(function(a, b) { return b - a; })
+  rankingArrays.amee.sort(function(a, b) { return b - a; })
 
   updateTable();
 }
@@ -430,6 +454,13 @@ function updateTable(){
   rows.data(countryData, function(d){ return d.iso3; });
 
   rows.each(function(d){
+    if (regionFilter === "world"){
+      d3.select(this).classed('hidden', false);
+    } else if (d.region === regionFilter) {
+      d3.select(this).classed('hidden', false);
+    } else {
+      d3.select(this).classed('hidden', true);
+    }
     d3.select(this).select('.score-text').text(oneDecimal(d.score));
     for(var i=0; i<graphSegments.length; i++){
       selector = ".graph-segment." + graphSegments[i] + "W";
@@ -452,19 +483,28 @@ function updateTable(){
 function updateMapColors(){
 
   quantize.domain([
-      d3.min(d3.values(countryData), function(d) { return d.score; }),
-      d3.max(d3.values(countryData), function(d) { return d.score; })
+      // d3.min(d3.values(countryData), function(d) { return d.score; }),
+      // d3.max(d3.values(countryData), function(d) { return d.score; })
+      d3.min(rankingArrays[regionFilter]),
+      d3.max(rankingArrays[regionFilter])
     ]);
   if(quantize.domain()[0] === 0 && quantize.domain()[1] === 0) {quantize.domain([0,1])}
   countries.selectAll('.country').each(function(d,i){
     if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
       // index starts at 0, ranking starts at 1, so add 1
-      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArray) + 1;
-      d3.select(this).style("fill", function(d){
-          return quantize(scoreLookup[d.properties.iso]);
+      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArrays.world) + 1;
+      var regionRank = null;
+      if(d.properties.region !== "null"){
+        regionRank = $.inArray(scoreLookup[d.properties.iso], rankingArrays[d.properties.region ]) + 1;
+      }
+      d3.select(this).attr('data-score', scoreLookup[d.properties.iso])
+        .attr('data-rank', rank)
+        .attr('data-region-rank', regionRank)
+        .style("fill", function(d){
+          if(regionFilter === "world" || d.properties.region === regionFilter){
+            return quantize(scoreLookup[d.properties.iso]);
+          } else { return defaultFill }
         })
-        .attr('data-score', scoreLookup[d.properties.iso])
-        .attr('data-rank', rank);
     } else {
       d3.select(this).style("fill", function(d){
         return defaultFill;
@@ -476,9 +516,14 @@ function updateMapColors(){
   svg.selectAll('.locator').each(function(d,i){
     if(scoreLookup[d.properties.iso] || scoreLookup[d.properties.iso] === 0){
       // index starts at 0, ranking starts at 1, so add 1
-      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArray) + 1;
+      var rank = $.inArray(scoreLookup[d.properties.iso], rankingArrays.world) + 1;
+      var regionRank = null;
+      if(d.properties.region !== "null"){
+        regionRank = $.inArray(scoreLookup[d.properties.iso], rankingArrays[d.properties.region ]) + 1;
+      }
       d3.select(this).attr('data-score', scoreLookup[d.properties.iso])
-        .attr('data-rank', rank);
+        .attr('data-rank', rank)
+        .attr('data-region-rank', regionRank);
     } else {
       d3.select(this).attr('data-score', '');
     }
@@ -552,7 +597,9 @@ function checkedPrograms(change){
 function populateMapTooltip(d, el){
   var tooltipText = "<strong>" + d.properties.name + " - <small>";
   var score = d3.select(el).attr('data-score');
-  tooltipText += score ? oneDecimal(score) + ' | #' + d3.select(el).attr('data-rank') : 'n/a';
+  tooltipText += score ? oneDecimal(score) + ' | <i class="fa fa-globe"></i> #' + d3.select(el).attr('data-rank') : '';
+  tooltipText += (d.properties.region !== "null") ? ' | ' + d.properties.region.toUpperCase() + ' #' + d3.select(el).attr('data-region-rank') : '';
+  tooltipText += score ? '' : 'n/a';
   tooltipText += "</small></strong>";
   if(showStaff === true && d.properties.staffcount > 0){
     tooltipText += '<br><small>';
@@ -608,6 +655,15 @@ function toggleGroup(el){
     toggle.classed({'fa-toggle-on':false, 'fa-toggle-off':true});
   } else { toggle.classed({'fa-toggle-on':true, 'fa-toggle-off':false}); }
 
+  setWeighting();
+}
+
+// toggle region on or off
+function toggleRegion(el){
+  d3.selectAll(".region-toggle-wrapper").classed("inactive-region",true);
+  d3.selectAll(".region-toggle").classed({'fa-toggle-on':false, 'fa-toggle-off':true});
+  d3.select(el.parentNode).classed("inactive-region",false);
+  d3.select(el).classed({'fa-toggle-on':true, 'fa-toggle-off':false});
   setWeighting();
 }
 

@@ -143,9 +143,21 @@
   </div>
 
 <div class="container">
+    <div class="row" style="text-align:center;">
+      <h4>
+        <span class="region-toggle-wrapper "><i class="fa fa-globe"></i> World &nbsp;<i id="world" class="region-toggle fa fa-toggle-on" onclick="toggleRegion(this);"></i></span>
+        &nbsp; <small>|</small> &nbsp;
+        <span class="region-toggle-wrapper inactive-region">LAC &nbsp;<i id="lac" class="region-toggle fa fa-toggle-off" onclick="toggleRegion(this);"></i></span>
+        &nbsp; <small>|</small> &nbsp;
+        <span class="region-toggle-wrapper inactive-region">Africa &nbsp;<i id="africa" class="region-toggle fa fa-toggle-off" onclick="toggleRegion(this);"></i></span>
+        &nbsp; <small>|</small> &nbsp;
+        <span class="region-toggle-wrapper inactive-region">AMEE &nbsp;<i id="amee" class="region-toggle fa fa-toggle-off" onclick="toggleRegion(this);"></i></span>
+      </h4>
+      <hr style="margin:12px auto 0 auto; max-width:400px;">
+    </div>
     <div class="row">
       <div id="need-group" class="col-sm-4">
-        <h3>Need &nbsp;<i id="need" class="toggle-group fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
+        <h3>Need &nbsp;<i id="need" class="group-toggle fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
         <hr>
         <div class="subcat-group">
           <h4>Disaster exposure</h4>
@@ -167,7 +179,7 @@
         </div>
       </div>
       <div id="funding-group" class="col-sm-4">
-        <h3>Available funding &nbsp;<i id="funding" class="toggle-group fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
+        <h3>Available funding &nbsp;<i id="funding" class="group-toggle fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
         <hr>
         <div class="subcat-group">
           <h5 class="subcat">USAID &nbsp; <small><span class="usaid weight"></span></small></h5>
@@ -180,7 +192,7 @@
         </div>
       </div>
       <div id="entry-group" class="col-sm-4">
-        <h3>Ease of operations &nbsp;<i id="entry" class="toggle-group fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
+        <h3>Ease of operations &nbsp;<i id="entry" class="group-toggle fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
         <hr>
         <div class="subcat-group">
           <h5 class="subcat">Security (lack of human conflict) &nbsp; <small><span class="security weight"></span></small></h5>
