@@ -146,15 +146,19 @@
 
 #disasters {
   cursor: default;
+  pointer-events: none;
 }
 #conflict {
   cursor: default;
+  pointer-events: none;
 }
 #coping {
   cursor: default;
+  pointer-events: none;
 }
 #emdat {
   cursor: default;
+  pointer-events: none;
 }
 
 #disasters .noUi-handle {
