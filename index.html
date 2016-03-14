@@ -62,35 +62,23 @@
 <p><h5>Total population - based on the de facto definition of population, which counts all residents regardless of legal status or citizenship, 2014 midyear estimate</h5>
 <small>Data source: World Bank (from various source organizations)</small></p>
 
+<p><h5>ISD has received USG funding (last 3 years) - countries where ISD has received funding from either OFDA or PRM. This demonstrates not just USG interest but a proven ability by ISD to secure USG funds in a given country.</h5>
+<small>Data source: ARC</small></p>
+
 <p><h5>USAID funding - 2014 disbursements</h5>
 <small>Data source: USAID</small></p>
 
-<p><h5>High migration to USA - total immigration to the USA by country of origin </h5>
+<p><h5>Migration to USA - total immigration to the USA by country of origin </h5>
 <small>Data source: Global Bilateral Migration, Last Updated: 06/28/2011</small></p>
 
 <p><h5>Presence of top 25 companies - presence of top 25 companies on the Fortune 500 </h5>
 <small>Data source: websites of companies </small></p>
-
-<p><h5>ODA - Official Development Assistance, 2012-2013 average</h5>
-<small>Data source: OECD and World Bank (2013 was the most recent year for which data were available)</small></p>
 
 <p><h5>Security (lack of human conflict) - includes current and projected levels </h5>
 <small>Data source: INFORM database 2016 v0.2.27.</small></p>
 
 <p><h5>Presence of IFRC office - existing IFRC office </h5>
 <small>Data source: ARC, IFRC (data updated as of December 2015)</small></p>
-
-<p><h5>ARC disaster deployments - ARC staff deployed, 2009-2015  </h5>
-<small>Data source: ARC (data from 2009-2015, inclusive)</small></p>
-
-<p><h5>ARC disaster money - ARC monetary contributions, 2009-2015  </h5>
-<small>Data source: ARC (data from 2009-2015, inclusive)</small></p>
-
-<p><h5>CTP response (all IFRC appeals) - CTP response implemented as part of an IFRC appeal</h5>
-<small>Data source: IFRC</small></p>
-
-<p><h5>CTP response (ARC) - CTP response implemented with ARC involvement </h5>
-<small>Data source: ARC, IFRC </small></p>
 
 <p><h5>ISD staff presence - current ARC staff based in the country </h5>
 <small>Data source: ARC (data updated as of December 2015)</small></p>
@@ -126,6 +114,8 @@
       <hr class="hr-small">
       <small><span class="info-icon" onclick="togglePrograms(this);">
         <i class="fa fa-fw fa-eye"></i> <span id="toggle-prgs-label">show FY16 programs</span>
+      </span><br><span class="info-icon" onclick="toggleActiveRecovery(this);">
+        <i class="fa fa-fw fa-eye"></i> <span id="toggle-activerecovery-label">show active recovery programs</span>
       </span><br><span class="info-icon" onclick="toggleStaff(this);">
         <i class="fa fa-fw fa-eye"></i> <span id="toggle-staff-label">show staff</span>
       </span></small>
@@ -162,13 +152,13 @@
         <div class="subcat-group">
           <h4>Disaster exposure</h4>
           <h5 class="subcat">Natural &nbsp; <small><span class="disasters weight"></span></small></h5>
-        	<div class="sliders need" id="disasters"></div>
+        	<div disabled="true" class="sliders need" id="disasters"></div>
           <h5 class="subcat">Conflict &nbsp; <small><span class="conflict weight"></span></small></h5>
-          <div class="sliders need" id="conflict"></div>
+          <div disabled="true" class="sliders need" id="conflict"></div>
           <h5 class="subcat">Institutional/ infrastructure weakness &nbsp; <small><span class="coping weight"></span></small></h5>
-          <div class="sliders need" id="coping"></div>
+          <div disabled="true" class="sliders need" id="coping"></div>
           <h5 class="subcat">People affected by disasters &nbsp; <small><span class="emdat weight"></span></small></h5>
-        	<div class="sliders need" id="emdat"></div>
+        	<div disabled="true" class="sliders need" id="emdat"></div>
           <h4>People</h4>
           <h5 class="subcat">Socio-economic/ demographic vulnerability &nbsp; <small><span class="vuln weight"></span></small></h5>
         	<div class="sliders need" id="vuln"></div>
@@ -182,9 +172,11 @@
         <h3>Available funding &nbsp;<i id="funding" class="group-toggle fa fa-toggle-on" onclick="toggleGroup(this);"></i></h3>
         <hr>
         <div class="subcat-group">
+          <h5 class="subcat">ISD has received USG funding &nbsp; <small><span class="usg weight"></span></small></h5>
+          <div class="sliders funding" id="usg"></div>
           <h5 class="subcat">USAID &nbsp; <small><span class="usaid weight"></span></small></h5>
           <div class="sliders funding" id="usaid"></div>
-          <h5 class="subcat">Migh migration to USA &nbsp; <small><span class="usmigr weight"></span></small></h5>
+          <h5 class="subcat">Migration to USA &nbsp; <small><span class="usmigr weight"></span></small></h5>
           <div class="sliders funding" id="usmigr"></div>
           <h5 class="subcat">Presence of top 25 companies &nbsp; <small><span class="top25 weight"></span></small></h5>
           <div class="sliders funding" id="top25"></div>
@@ -214,13 +206,13 @@
             <div><small>Select <a onclick="checkedPrograms('all');">all</a> | <a onclick="checkedPrograms('none');">none</a></small></div>
             <div id="program-sectors">
               <div class="checkbox">
-                <label><input type="checkbox" name="program-check" value="fy16cbh" onchange="setWeighting();" checked>Community-based health</label>
+                <label><input type="checkbox" name="program-check" value="fy16cbh" onchange="setWeighting();" >Community-based health</label>
               </div>
               <div class="checkbox">
                 <label><input type="checkbox" name="program-check" value="fy16dr" onchange="setWeighting();" checked>Disaster recovery</label>
               </div>
               <div class="checkbox">
-                <label><input type="checkbox" name="program-check" value="fy16measles" onchange="setWeighting();" checked>Measles prevention</label>
+                <label><input type="checkbox" name="program-check" value="fy16measles" onchange="setWeighting();" >Measles prevention</label>
               </div>
               <div class="checkbox">
                 <label><input type="checkbox" name="program-check" value="fy16resilience" onchange="setWeighting();" checked>Resilience building</label>

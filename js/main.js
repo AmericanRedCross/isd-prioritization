@@ -59,6 +59,7 @@ function setup(width,height){
   labels = svg.append("g").classed("map-labels", true);
   staffs = svg.append("g").classed("staff-markers", true);
   programs = svg.append("g").classed("program-markers", true);
+  recoverys = svg.append("g").classed("recovery-markers", true);
 }
 
 setup(width,height);
@@ -79,9 +80,10 @@ var defaults = {
   popurban: { weight: 2, title: "Urban population", color:"#c6dbef" },
   poptotal: { weight: 0, title: "Total population", color:"#deebf7" },
   funding: { weight: 1 }, // ## category (0 or 1)
-  usaid: { weight: 4, title: "USAID", color:"#006d2c" },
-  usmigr: { weight: 0, title: "High migration to USA", color:"#238b45" },
-  top25: { weight: 0, title: "Presence of top 25 companies", color:"#41ab5d" },
+  usg: { weight: 4, title: "USG funding received", color:"#006d2c" },
+  usaid: { weight: 0, title: "USAID", color:"#238b45" },
+  usmigr: { weight: 0, title: "High migration to USA", color:"#41ab5d" },
+  top25: { weight: 0, title: "Presence of top 25 companies", color:"#74c476" },
   entry: { weight: 1 }, // ## category (0 or 1)
   security: { weight: 8, title: "Security", color:"#4d004b" },
   ifrcoffice: { weight: 5, title: "IFRC office", color:"#810f7c" },
@@ -97,7 +99,7 @@ for(key in defaults){
 
 var regionFilter = "world";
 
-var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usaid","usmigr","top25","security","ifrcoffice","isdstaff","fy16"];
+var graphSegments = ["disasters","conflict","coping","emdat","vuln","popurban","poptotal","usg","usaid","usmigr","top25","security","ifrcoffice","isdstaff","fy16"];
 
 $.each(graphSegments, function(i, segment){
   sliderSearch = "#" + segment + ".sliders";
@@ -157,6 +159,7 @@ function grabData(){
       staffcount: getNumber(d.staffcount),
       staffcity: d.staffcity,
       ofac: d.ofac,
+      activerecovery: getNumber(d.activerecovery),
       fy16cbh: getNumber(d.fy16cbh), //
       fy16dr: getNumber(d.fy16dr), //
       fy16measles: getNumber(d.fy16measles), //
@@ -205,6 +208,9 @@ function buildTable(){
         $.each(fy16sectors, function(i, sector){
           if(d[sector.key] > 0){ thisSectorArray.push(sector.label); }
         });
+        if(d.activerecovery === 10) {
+          html += '<i class="fa fa-wrench fa-fw activerecovery-icon"></i>';
+        }
         if(thisSectorArray.length > 0){
           html += '<i class="fa fa-cog fa-fw fy16-icon" data-fy16="' + thisSectorArray.sort(d3.ascending).join("<br> ") + '"></i>';
         }
@@ -222,6 +228,13 @@ function buildTable(){
 
       d3.selectAll(".graph-segment").on("mouseover", function(d){
         var tooltipText = "<small><b>" + $(this).attr("data-label") + "</b> - " + $(this).attr("data-score") + "</small>";
+        $('#tooltip').html(tooltipText);
+      }).on("mouseout", function(){
+        $('#tooltip').empty();
+      });
+
+      d3.selectAll(".activerecovery-icon").on("mouseover", function(d){
+        var tooltipText = "<small>Active recovery program</small>";
         $('#tooltip').html(tooltipText);
       }).on("mouseout", function(){
         $('#tooltip').empty();
@@ -278,6 +291,7 @@ function grabGeoData(){
           geo.properties.region = country.region;
           geo.properties.staffcount = country.staffcount;
           geo.properties.staffcity = country.staffcity;
+          geo.properties.activerecovery = country.activerecovery;
           geo.properties.fy16 = {};
           fy16sectors.forEach(function(sector){
             geo.properties.fy16[sector.key] = country[sector.key]
@@ -328,6 +342,22 @@ function drawLayers(){
         $('#tooltip').empty();
       });
     if(showStaff === false){ d3.selectAll(".staff-locator").classed('hide',true)}
+
+    staffs.selectAll(".recoverys")
+      .data(world.filter(function(geo){
+        return geo.properties.activerecovery > 0;
+      })).enter().append('circle')
+        .attr("cx", function(d){ return (path.centroid(d))[0]; })
+        .attr("cy", function(d){ return (path.centroid(d))[1]; })
+        .attr("class", "locator activerecovery-locator")
+        .attr("r", 8)
+        .on("mouseover", function(d){
+          populateMapTooltip(d, this);
+        })
+        .on("mouseout", function(d){
+          $('#tooltip').empty();
+        });
+      if(showActiveRecovery === false){ d3.selectAll(".activerecovery-locator").classed('hide',true)}
 
     drawGeoData();
 }
@@ -398,7 +428,7 @@ function adjustScores(){
 
   $.each(countryData, function(countryIndex, country){
     var weightingsSum = (weightings.need * (weightings.disasters + weightings.conflict + weightings.coping + weightings.emdat + weightings.vuln + weightings.popurban + weightings.poptotal)) +
-      (weightings.funding * (weightings.usaid + weightings.top25 + weightings.usmigr)) +
+      (weightings.funding * (weightings.usg + weightings.usaid + weightings.top25 + weightings.usmigr)) +
       (weightings.entry * (weightings.ifrcoffice + weightings.isdstaff + weightings.security + weightings.fy16));
     // weightings need/funding/entry will all be 1-0 for on-off
     country.disastersW =  weightings.need * (weightings.disasters * country.disasters / weightingsSum);
@@ -408,6 +438,7 @@ function adjustScores(){
     country.vulnW = weightings.need * (weightings.vuln * country.vuln / weightingsSum);
     country.popurbanW = weightings.need * (weightings.popurban * country.popurban / weightingsSum);
     country.poptotalW = weightings.need * (weightings.poptotal * country.poptotal / weightingsSum);
+    country.usgW = weightings.funding * (weightings.usg * country.usg / weightingsSum);
     country.usaidW = weightings.funding * (weightings.usaid * country.usaid / weightingsSum);
     country.top25W = weightings.funding * (weightings.top25 * country.top25 / weightingsSum);
     country.usmigrW = weightings.funding * (weightings.usmigr * country.usmigr / weightingsSum);
@@ -426,7 +457,7 @@ function adjustScores(){
       subCat = graphSegments[i] + "W";
       if(isNaN(country[subCat])){ country[subCat] = 0;};
     }
-    country.score = country.disastersW + country.conflictW + country.copingW + country.emdatW + country.vulnW + country.popurbanW + country.poptotalW +  country.usaidW + country.top25W + country.usmigrW + country.securityW + country.ifrcofficeW + country.isdstaffW + country.fy16W;
+    country.score = country.disastersW + country.conflictW + country.copingW + country.emdatW + country.vulnW + country.popurbanW + country.poptotalW + country.usgW +  country.usaidW + country.top25W + country.usmigrW + country.securityW + country.ifrcofficeW + country.isdstaffW + country.fy16W;
     scoreLookup[country.iso3] = country.score;
     if($.inArray(country.score, rankingArrays.world) === -1){rankingArrays.world.push(country.score)}
     var regions = ["lac","africa","amee"];
@@ -454,6 +485,8 @@ function updateTable(){
   rows.data(countryData, function(d){ return d.iso3; });
 
   rows.each(function(d){
+    // console.log(d)
+    // console.log(d.score)
     if (regionFilter === "world"){
       d3.select(this).classed('hidden', false);
     } else if (d.region === regionFilter) {
@@ -611,7 +644,10 @@ function populateMapTooltip(d, el){
     $.each(fy16sectors, function(i, sector){
       if(d.properties.fy16[sector.key] > 0){ thisSectorArray.push(sector.label); }
     });
-    tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '<small>' : '';
+    tooltipText += (thisSectorArray.length > 0) ? '<br><small>' + thisSectorArray.sort(d3.ascending).join("<br> ") + '</small>' : '';
+  }
+  if(showActiveRecovery === true && d.properties.activerecovery > 0){
+    tooltipText += '<br><small><i class="fa fa-wrench"></i> Active recovery program</small>';
   }
   $('#tooltip').append(tooltipText);
 }
@@ -647,6 +683,23 @@ function togglePrograms(el){
       showPrograms = false;
     }
 }
+
+var showActiveRecovery = false;
+function toggleActiveRecovery(el){
+  var toggle = d3.select(el).select('i');
+    if(toggle.classed('fa-eye')){
+      toggle.classed({'fa-eye':false, 'fa-eye-slash':true});
+      d3.select('#toggle-activerecovery-label').text('hide active recovery programs');
+      d3.selectAll('.activerecovery-locator').classed('hide',false);
+      showActiveRecovery = true;
+    } else {
+      toggle.classed({'fa-eye':true, 'fa-eye-slash':false});
+      d3.select('#toggle-activerecovery-label').text('show active recovery programs');
+      d3.selectAll('.activerecovery-locator').classed('hide',true);
+      showActiveRecovery = false;
+    }
+}
+
 
 // toggle grouping on or off
 function toggleGroup(el){
