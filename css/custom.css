@@ -44,15 +44,28 @@
   text-align:center;
   margin-bottom: -50px;
 }
-.staff-icon, .fy16-icon, .activerecovery-icon {
+.staff-icon {
   color: #3d3d3e;
 }
+.fy16-icon{
+  color: #3d3d3e;
+}
+.activerecovery-icon {
+  color: #3d3d3e;
+}
+
 .fy16-locator {
   fill: rgba(0,75,121,0);
   stroke-width: 1.5px;
   stroke: rgba(0,75,121,1);
 }
-.fy16-locator.hide, .activerecovery-locator.hide, .staff-locator.hide {
+.fy16-locator.hide {
+  display: none;
+}
+.activerecovery-locator.hide {
+  display: none;
+}
+.staff-locator.hide {
   display: none;
 }
 .activerecovery-locator {
